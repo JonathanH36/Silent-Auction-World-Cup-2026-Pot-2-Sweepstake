@@ -953,20 +953,12 @@ async function startPairsPhase(){
   // playerOrder: best avg first (i.e. the END of the sorted list, since sorted is worst-first)
   const playerOrder = [...r.sorted].reverse().map(row => row.playerId);
   const N = playerOrder.length;
+  // Snake draft, two picks each: best finisher pairs with worst, and so on.
+  // Uses the top 2N draft slots; any teams ranked below 2N are left undrafted.
+  // N=6 -> [1,12],[2,11]...[6,7];  N=5 -> [1,10],[2,9]...[5,6] (11 & 12 sit out);
+  // N=4 -> [1,8]...[4,5];  N=3 -> [1,6],[2,5],[3,4].
   const groups = [];
-  if(N === 6){
-    for(let i=0;i<6;i++) groups.push([i+1, 12-i]);
-  } else {
-    const picksPer = Math.floor(POT2.length / N);
-    const remainder = POT2.length % N;
-    let pos = 1;
-    for(let i=0;i<N;i++){
-      const size = picksPer + (i < remainder ? 1 : 0);
-      const g = [];
-      for(let k=0;k<size;k++) g.push(pos++);
-      groups.push(g);
-    }
-  }
+  for(let i=0;i<N;i++) groups.push([i+1, 2*N - i]);
   await dbUpdate(`rooms/${ROOM}`, {
     phase: "pairs",
     pairs: { playerOrder, groups, currentChooser: 0, assignments: {} }
@@ -1000,7 +992,9 @@ async function goToTeams(){
     for(const [pid, gIdx] of Object.entries(pairs.assignments || {})){
       if(pairs.groups[gIdx] && pairs.groups[gIdx].includes(pos)){ owner = pid; break; }
     }
-    pickPositions.push({ position: pos, playerId: owner });
+    // Skip undrafted slots (e.g. 11 & 12 in a 5-player game) so the team
+    // draft doesn't stall waiting on a position that nobody owns.
+    if(owner) pickPositions.push({ position: pos, playerId: owner });
   }
   const teamOrder = shuffle(POT2);
   await dbUpdate(`rooms/${ROOM}`, {
