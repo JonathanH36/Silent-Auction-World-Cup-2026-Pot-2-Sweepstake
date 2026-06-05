@@ -613,11 +613,23 @@ async function joinRoom(code, name){
   code = code.toUpperCase().trim();
   const existing = await dbGet(`rooms/${code}`);
   if(!existing){ alert("Room not found."); return false; }
-  if(existing.phase !== "lobby" && !(existing.players||{})[ME()]){
+
+  // Check if a player with this name already exists — restore their session if so
+  const players = existing.players || {};
+  const matchByName = Object.values(players).find(p => p.name.toLowerCase() === name.toLowerCase());
+  if(matchByName){
+    setMe(matchByName.id);
+    ROOM = code;
+    attachRoom(code);
+    return true;
+  }
+
+  if(existing.phase !== "lobby"){
     alert("Game already started, can't join."); return false;
   }
+
   ROOM = code;
-  const cIdx = nextColourIdx(existing.players || {});
+  const cIdx = nextColourIdx(players);
   await dbSet(`rooms/${code}/players/${ME()}`,
     { id: ME(), name, colourIdx: cIdx, coins: STARTING_COINS, horseIds: [], joinedAt: Date.now() });
   attachRoom(code);
@@ -1351,6 +1363,10 @@ function renderHome(){
       </div>
     </div>
     ${LOCAL_MODE ? `<div class="setup-banner"><b>Local Test Mode.</b> Everything works in one browser. Use the DEV panel (bottom-right) to add players. When it's not your turn, the panel offers a one-click jump to the next actor.</div>` : ""}
+    <div style="color:var(--muted);font-size:12px;text-align:center;margin-top:24px;padding:0 12px;line-height:1.7;">
+      <p style="margin:0 0 6px;"><b style="color:var(--text);">Yes, the API key is visible in the source.</b> That's intentional and fine.</p>
+      <p style="margin:0;">Firebase API keys are not secrets — they're identifiers. Security is enforced in two layers: the key is restricted to requests coming from this domain only, so it's useless anywhere else; and the database requires a valid authenticated session before it will accept any read or write. There's no sensitive data here anyway — it's a sweepstake. <a href="https://firebase.google.com/docs/projects/api-keys" target="_blank" style="color:var(--muted);text-decoration:underline;">Firebase docs.</a></p>
+    </div>
   `;
 }
 window.__create = () => {
