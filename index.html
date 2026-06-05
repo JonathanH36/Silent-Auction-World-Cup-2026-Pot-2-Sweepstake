@@ -1,0 +1,1886 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+<title>The Pot 2 Stakes — World Cup Sweepstake</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,500&display=swap" rel="stylesheet">
+
+<style>
+  :root{
+    --bg:#06070c;
+    --bg2:#0c0e17;
+    --panel:#10131f;
+    --panel-edge:#1d2233;
+    --gold:#f5c518;
+    --gold-dim:#9a7d18;
+    --green:#36c46a;
+    --green-glow:rgba(54,196,106,.45);
+    --red:#e23636;
+    --red-glow:rgba(226,54,54,.55);
+    --turf:#1a6b2e;
+    --turf-light:#2a8f3f;
+    --turf-dark:#0f4a1f;
+    --sky:#5db8ff;
+    --text:#f5f6fa;
+    --muted:#8b90a4;
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+  html,body{margin:0;padding:0;background:var(--bg);color:var(--text);
+    font-family:'DM Sans',system-ui,sans-serif;-webkit-font-smoothing:antialiased;}
+  body{
+    min-height:100vh;min-height:100dvh;
+    background:
+      radial-gradient(900px 600px at 50% -10%, rgba(245,197,24,.08), transparent 60%),
+      radial-gradient(700px 500px at 10% 110%, rgba(54,196,106,.15), transparent 55%),
+      radial-gradient(700px 500px at 90% 110%, rgba(226,54,54,.10), transparent 55%),
+      var(--bg);
+    overflow-x:hidden;
+  }
+  .wrap{max-width:780px;margin:0 auto;padding:18px 16px 100px;}
+  .display{font-family:'Anton',sans-serif;letter-spacing:.04em;text-transform:uppercase;line-height:.98;}
+  h1.display{font-size:clamp(34px,9vw,60px);margin:0;}
+  h2.display{font-size:clamp(22px,5.5vw,34px);margin:0 0 6px;}
+  h3.display{font-size:clamp(18px,4vw,22px);margin:0 0 4px;}
+  .gold{color:var(--gold);}
+  .green{color:var(--green);}
+  .sub{color:var(--muted);font-size:13px;letter-spacing:.14em;text-transform:uppercase;}
+  .center{text-align:center;}
+  .panel{background:var(--panel);border:1px solid var(--panel-edge);border-radius:14px;padding:18px;margin:14px 0;}
+  .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;
+    background:var(--gold);color:#000;border:none;border-radius:10px;
+    padding:14px 20px;font-family:'Anton',sans-serif;letter-spacing:.06em;
+    text-transform:uppercase;font-size:18px;cursor:pointer;transition:.12s transform,.12s box-shadow;
+    box-shadow:0 4px 0 var(--gold-dim);}
+  .btn:hover{transform:translateY(-1px);box-shadow:0 5px 0 var(--gold-dim);}
+  .btn:active{transform:translateY(2px);box-shadow:0 2px 0 var(--gold-dim);}
+  .btn:disabled{opacity:.35;cursor:not-allowed;transform:none;box-shadow:0 4px 0 var(--gold-dim);}
+  .btn.secondary{background:var(--panel);color:var(--text);border:1px solid var(--panel-edge);box-shadow:none;}
+  .btn.green{background:var(--green);color:#000;box-shadow:0 4px 0 #1f7a3f;}
+  .btn.big{padding:22px 28px;font-size:24px;}
+  .btn.huge{padding:28px;font-size:28px;width:100%;}
+  .btn.small{padding:8px 14px;font-size:14px;}
+  input[type=text]{
+    background:#070910;color:var(--text);border:1px solid var(--panel-edge);
+    border-radius:10px;padding:14px 16px;font-size:16px;width:100%;
+    font-family:'DM Sans',sans-serif;}
+  input[type=text]:focus{outline:none;border-color:var(--gold);}
+  code{background:#070910;border:1px solid var(--panel-edge);border-radius:6px;padding:2px 6px;font-size:12px;}
+  .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center;}
+  .row.gap-sm{gap:6px;}
+  .col{display:flex;flex-direction:column;gap:10px;}
+  .pill{display:inline-block;background:#070910;border:1px solid var(--panel-edge);border-radius:999px;padding:4px 12px;font-size:12px;color:var(--muted);}
+  .pill.gold{border-color:var(--gold);color:var(--gold);}
+  .pill.green{border-color:var(--green);color:var(--green);}
+  .pill.red{border-color:var(--red);color:#ff8a8a;}
+  .player-tile{display:flex;align-items:center;justify-content:space-between;
+    background:#070910;border:1px solid var(--panel-edge);border-radius:10px;
+    padding:10px 14px;gap:8px;}
+  .player-tile.me{border-color:var(--gold);}
+  .player-tile.active{border-color:var(--green);background:rgba(54,196,106,.08);}
+  .player-tile.locked{opacity:.55;}
+  .player-tile .name-with-chip{display:inline-flex;align-items:center;gap:8px;}
+  .colour-chip{display:inline-block;width:14px;height:14px;border-radius:50%;
+    border:2px solid rgba(255,255,255,.4);flex-shrink:0;}
+  .coin-badge{font-family:'Anton',sans-serif;color:var(--gold);font-size:18px;letter-spacing:.04em;}
+
+  /* HORSE CARD */
+  .horse-card{background:linear-gradient(180deg,#141826,#0b0e17);
+    border:1px solid var(--panel-edge);border-radius:16px;padding:22px;
+    border-left:6px solid var(--gold);}
+  .horse-name{font-family:'Anton',sans-serif;letter-spacing:.04em;text-transform:uppercase;
+    color:var(--gold);font-size:clamp(28px,7vw,42px);line-height:1;}
+  .horse-bio{margin-top:12px;color:var(--text);font-size:15px;line-height:1.55;}
+  .horse-quirk{margin-top:10px;color:#ffb86b;font-size:14px;font-style:italic;line-height:1.4;}
+  .horse-num{display:inline-block;width:42px;height:42px;border-radius:50%;
+    font-family:'Anton',sans-serif;font-size:26px;line-height:42px;text-align:center;
+    margin-right:10px;vertical-align:middle;}
+
+  /* AUCTION */
+  .auction-status{display:flex;justify-content:space-between;align-items:flex-end;gap:14px;margin-top:18px;}
+  .price{font-family:'Anton',sans-serif;letter-spacing:.04em;font-size:48px;color:var(--green);
+    line-height:1;text-shadow:0 0 20px var(--green-glow);}
+  .countdown{font-family:'Anton',sans-serif;letter-spacing:.04em;font-size:42px;color:var(--gold);line-height:1;}
+  .countdown.urgent{color:var(--red);}
+  .high-bidder{font-size:13px;color:var(--muted);margin-top:6px;}
+  .high-bidder b{color:var(--text);}
+  .stage-banner{font-family:'Anton',sans-serif;letter-spacing:.1em;text-transform:uppercase;
+    text-align:center;padding:10px;border-radius:8px;font-size:16px;margin-bottom:14px;}
+  .stage-banner.reading{background:rgba(245,197,24,.12);color:var(--gold);border:1px solid var(--gold);}
+  .stage-banner.bidding{background:rgba(54,196,106,.12);color:var(--green);border:1px solid var(--green);}
+
+  .cap-banner{background:rgba(226,54,54,.08);border:1px solid var(--red);border-radius:10px;
+    padding:10px 14px;font-size:13px;margin-bottom:10px;color:#ffb3b3;text-align:center;}
+
+  .sold-banner{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;
+    background:rgba(0,0,0,.88);z-index:9999;pointer-events:none;opacity:0;transition:opacity .2s;}
+  .sold-banner.show{opacity:1;}
+  .sold-banner .gavel{font-size:140px;}
+  .sold-banner .word{font-family:'Anton',sans-serif;color:var(--red);font-size:96px;
+    letter-spacing:.1em;text-shadow:0 0 40px var(--red-glow);}
+
+  /* RACE */
+  .race-wrap{position:relative;width:100%;background:linear-gradient(180deg,
+      var(--sky) 0%, #a8d8ff 35%,
+      var(--turf-dark) 35%, var(--turf) 50%, var(--turf-light) 100%);
+    border-radius:14px;overflow:hidden;border:2px solid var(--panel-edge);
+    box-shadow:inset 0 -20px 40px rgba(0,0,0,.3);}
+  .race-svg{width:100%;height:auto;display:block;}
+
+  .horse-body{animation:bob .22s ease-in-out infinite;transform-origin:center;}
+  @keyframes bob{0%,100%{transform:translateY(0);}50%{transform:translateY(-1.5px);}}
+  .leg-front-a{animation:legFA .22s ease-in-out infinite;transform-origin:top;transform-box:fill-box;}
+  .leg-front-b{animation:legFB .22s ease-in-out infinite;transform-origin:top;transform-box:fill-box;}
+  .leg-back-a{animation:legBA .22s ease-in-out infinite;transform-origin:top;transform-box:fill-box;}
+  .leg-back-b{animation:legBB .22s ease-in-out infinite;transform-origin:top;transform-box:fill-box;}
+  @keyframes legFA{0%,100%{transform:rotate(-30deg);}50%{transform:rotate(20deg);}}
+  @keyframes legFB{0%,100%{transform:rotate(20deg);}50%{transform:rotate(-30deg);}}
+  @keyframes legBA{0%,100%{transform:rotate(25deg);}50%{transform:rotate(-25deg);}}
+  @keyframes legBB{0%,100%{transform:rotate(-25deg);}50%{transform:rotate(25deg);}}
+  .horse-group{transition:transform .14s linear;}
+
+  .commentary{margin-top:12px;background:#070910;border:1px solid var(--panel-edge);border-radius:10px;
+    padding:14px 16px;min-height:80px;font-size:15px;line-height:1.5;max-height:260px;overflow-y:auto;}
+  .commentary .line{margin-top:6px;}
+  .commentary .line.big{font-family:'Anton',sans-serif;color:var(--gold);font-size:20px;letter-spacing:.04em;}
+  .commentary .line:first-child{margin-top:0;}
+
+  /* TEAM GRID */
+  .team-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:14px;}
+  .team-tile{background:#070910;border:2px solid var(--panel-edge);border-radius:10px;
+    padding:18px 8px;text-align:center;cursor:pointer;font-size:15px;font-weight:600;
+    transition:.12s;color:var(--text);}
+  .team-tile:hover{border-color:var(--gold);transform:translateY(-2px);}
+  .team-tile.taken{opacity:.3;cursor:not-allowed;pointer-events:none;}
+  .team-tile.mine{border-color:var(--green);background:rgba(54,196,106,.15);}
+  .team-tile.locked{cursor:not-allowed;pointer-events:none;border-color:var(--panel-edge);}
+  .team-tile .owner{display:block;margin-top:4px;font-size:11px;font-weight:400;color:var(--muted);}
+
+  /* PAIR PICK */
+  .pair-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:12px;margin-top:14px;}
+  .pair-tile{background:#070910;border:2px solid var(--panel-edge);border-radius:12px;
+    padding:18px;text-align:center;cursor:pointer;font-family:'Anton',sans-serif;
+    font-size:28px;letter-spacing:.04em;color:var(--gold);transition:.12s;}
+  .pair-tile:hover{border-color:var(--gold);transform:translateY(-2px);}
+  .pair-tile.taken{opacity:.3;cursor:not-allowed;pointer-events:none;}
+  .pair-tile.locked{cursor:not-allowed;pointer-events:none;}
+  .pair-tile small{display:block;font-size:11px;color:var(--muted);font-family:'DM Sans',sans-serif;
+    margin-top:4px;letter-spacing:.08em;}
+
+  .turn-banner{background:linear-gradient(90deg,rgba(245,197,24,.15),rgba(54,196,106,.15));
+    border:1px solid var(--gold);border-radius:12px;padding:18px;text-align:center;margin:14px 0;}
+  .turn-banner.mine{background:linear-gradient(90deg,rgba(54,196,106,.3),rgba(54,196,106,.15));border-color:var(--green);}
+  .turn-banner .who{font-family:'Anton',sans-serif;font-size:26px;letter-spacing:.04em;text-transform:uppercase;color:var(--gold);}
+  .turn-banner.mine .who{color:var(--green);}
+  .turn-banner .desc{color:var(--muted);font-size:13px;margin-top:4px;}
+
+  /* INTRO SCREENS */
+  .intro-hero{background:linear-gradient(180deg, #2a1a08, #0b0e17);
+    border:1px solid var(--gold);border-radius:16px;padding:28px;text-align:center;}
+  .intro-hero h1{font-family:'Anton',sans-serif;color:var(--gold);font-size:clamp(38px,10vw,72px);
+    letter-spacing:.04em;text-transform:uppercase;line-height:1;margin:0 0 8px;}
+  .intro-hero .tag{font-size:14px;color:#ffe89c;letter-spacing:.12em;text-transform:uppercase;}
+  .intro-rules{font-size:15px;line-height:1.65;color:var(--text);margin:18px 0;}
+  .intro-rules b{color:var(--gold);}
+
+  /* REVEAL SCREEN */
+  .reveal-row{display:grid;grid-template-columns:60px 1fr auto;gap:14px;align-items:center;
+    background:#070910;border:1px solid var(--panel-edge);border-radius:12px;padding:14px 16px;
+    margin-top:8px;transition:.3s;}
+  .reveal-row.revealed{border-color:var(--gold);background:rgba(245,197,24,.06);}
+  .reveal-row.first{border-color:var(--green);background:rgba(54,196,106,.1);}
+  .reveal-rank{font-family:'Anton',sans-serif;font-size:32px;color:var(--gold);text-align:center;letter-spacing:.04em;line-height:1;}
+  .reveal-row.first .reveal-rank{color:var(--green);}
+  .reveal-name{font-family:'Anton',sans-serif;font-size:24px;letter-spacing:.04em;text-transform:uppercase;}
+  .reveal-info{font-size:12px;color:var(--muted);margin-top:2px;}
+  .reveal-avg{font-family:'Anton',sans-serif;font-size:22px;color:var(--gold);letter-spacing:.04em;}
+  .reveal-hidden{color:var(--muted);font-family:'Anton',sans-serif;font-size:24px;letter-spacing:.2em;}
+
+  /* DEV PANEL */
+  .dev-panel{position:fixed;bottom:10px;right:10px;background:#241f08;border:1px solid var(--gold);
+    border-radius:10px;padding:12px;z-index:1000;font-size:12px;color:var(--gold);
+    max-width:300px;}
+  .dev-panel select{background:#000;color:var(--gold);border:1px solid var(--gold);padding:6px;border-radius:4px;width:100%;font-size:13px;}
+  .dev-panel h4{margin:0 0 6px;font-family:'Anton',sans-serif;letter-spacing:.06em;font-size:14px;}
+  .dev-panel input{background:#000;color:var(--gold);border:1px solid var(--gold);padding:5px;border-radius:4px;width:100%;font-size:12px;font-family:'DM Sans',sans-serif;}
+  .dev-panel .quick{background:var(--gold);color:#000;border:none;padding:5px 8px;border-radius:4px;font-size:11px;font-family:'Anton',sans-serif;letter-spacing:.04em;cursor:pointer;width:100%;margin-top:4px;}
+
+  /* AUDIO GATE */
+  .audio-gate{position:fixed;inset:0;background:rgba(6,7,12,.95);z-index:10000;display:flex;
+    flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:30px;}
+  .audio-gate h1{font-family:'Anton',sans-serif;color:var(--gold);font-size:48px;letter-spacing:.04em;margin:0 0 16px;}
+  .audio-gate p{color:var(--text);max-width:380px;line-height:1.5;margin:0 0 24px;}
+
+  .setup-banner{background:rgba(245,197,24,.08);border:1px solid var(--gold);border-radius:12px;
+    padding:14px 16px;font-size:13px;line-height:1.5;color:#ffe89c;}
+  hr.div{border:none;border-top:1px solid var(--panel-edge);margin:14px 0;}
+</style>
+</head>
+<body>
+<div id="audio-gate" class="audio-gate" style="display:none;">
+  <h1>🐎 The Pot 2 Stakes</h1>
+  <p>Tap to enable sound. You'll get crowd noise, gavel sounds, and a galloping commentator.</p>
+  <button class="btn big" onclick="window.__enableAudio()">Enable Sound & Begin</button>
+</div>
+<div class="wrap" id="app"></div>
+<div id="sold-banner" class="sold-banner"><div class="col center"><div class="gavel">🔨</div><div class="word">SOLD!</div></div></div>
+
+<script type="module">
+/* =================================================================
+   POT 2 STAKES v3 — World Cup 2026 Sweepstake App
+   Two races · auction cap · player colours · worst-to-best reveal
+   ================================================================= */
+
+import { initializeApp }           from "https://www.gstatic.com/firebasejs/11.0.0/firebase-app.js";
+import { getDatabase, ref, set, update, get, onValue, runTransaction }
+                                   from "https://www.gstatic.com/firebasejs/11.0.0/firebase-database.js";
+import { getAuth, signInAnonymously, onAuthStateChanged }
+                                   from "https://www.gstatic.com/firebasejs/11.0.0/firebase-auth.js";
+
+const LOCAL_MODE = false;  // ← true = local-only demo, false = live Firebase
+
+const firebaseConfig = {
+  apiKey:            "AIzaSyCUEOtH17CTEG8vHpWyeSZGvx5mSyv8FrA",
+  authDomain:        "silent-auction-f29fe.firebaseapp.com",
+  databaseURL:       "https://silent-auction-f29fe-default-rtdb.europe-west1.firebasedatabase.app",
+  projectId:         "silent-auction-f29fe",
+  storageBucket:     "silent-auction-f29fe.firebasestorage.app",
+  messagingSenderId: "24986835860",
+  appId:             "1:24986835860:web:c901902da0836ae1040d81"
+};
+/* FIREBASE CONFIG INTENTIONALLY PUBLIC — security via DB rules + key restrictions, see firebase.google.com/docs/projects/api-keys */
+
+const _firebaseApp = LOCAL_MODE ? null : initializeApp(firebaseConfig);
+const _firebaseDb  = LOCAL_MODE ? null : getDatabase(_firebaseApp);
+const _firebaseAuth = LOCAL_MODE ? null : getAuth(_firebaseApp);
+
+// Silently sign every visitor in anonymously before any DB call is made.
+// The DB rules require auth != null, so this is the gate.
+let _authReady = LOCAL_MODE
+  ? Promise.resolve()
+  : new Promise(resolve => {
+      onAuthStateChanged(_firebaseAuth, user => {
+        if(user) { resolve(); }
+        else { signInAnonymously(_firebaseAuth).catch(e => console.error("Anon auth failed:", e)); }
+      });
+    });
+
+/* =================================================================
+   CONSTANTS
+   ================================================================= */
+const POT2 = ["Croatia","Morocco","Colombia","Uruguay","Switzerland","Japan",
+              "Senegal","Iran","South Korea","Ecuador","Austria","Australia"];
+
+const PROFILE_MS = 15000;
+const BID_MS     = 12000;
+const RACE_COUNTDOWN_MS = 5000;
+const RACE_DURATION_MS  = 60000;
+const REVEAL_INTERVAL_MS = 4500;
+const STARTING_COINS = 150;       // initial balance
+const FIRST_WIN_BONUS = 50;       // added to balance when a player wins their first horse
+const MAX_HORSES_PER_PLAYER = 2;  // 1 for race 1, 1 for race 2
+const BID_INCREMENT = 5;
+const OPENING_BID = 20;
+
+const HORSE_POOL = [
+  { name:"Butler's Revenge", bio:"Six-year-old bay gelding by Frankel out of a Galileo mare. Two-time Melbourne Cup winner, slick turn of foot, proven over the distance, ground no concern.", quirk:"Once took a beating off Marmaduke Spicer.", body:"#8b4513", mane:"#3a1f0a" },
+  { name:"Scott Colvin", bio:"Five-year-old chestnut mare. Won the Ebor by three lengths last August, in sparkling form on the gallops, trainer reports she's never been better.", quirk:"Follows West Ham home and away. Part of the Inter City Firm.", body:"#d4a373", mane:"#7a5230" },
+  { name:"Marwin's Miracle", bio:"Promising four-year-old colt from the powerful Gosden yard. Handles all surfaces, stays well, jockey unbeaten on him in three starts, including the Breeders' Cup Classic.", quirk:"Hates Magnums. The condoms. Not the ice cream.", body:"#5c4033", mane:"#2a1a0a" },
+  { name:"Brenda's Wheelchair", bio:"Seven-year-old bay stallion, dual-purpose campaigner with three Grade 1 wins over fences. Battle-hardened, loves a fight to the line, the more rain the better. Favourite by a distance", quirk:"Has a Nectar card but only shops at Waitrose.", body:"#a0a0a8", mane:"#6a6a72" },
+  { name:"Last Orders", bio:"Four-year-old grey, broke the course record at Royal Ascot in June. Quick out of the stalls, devastating finishing kick, jockey says he's never sat on better.", quirk:"Was barred from a Wetherspoons in Doncaster. Was only drinking Carling.", body:"#bcbcc0", mane:"#7a7a82" },
+  { name:"Was Mr. Colvin's first name Scott?", bio:"Five-year-old Scottish-bred gelding, hardy as they come. Three from three at York this season, stays all day, handles cut in the ground beautifully.", quirk:"Eldest of four Brothers - Harry, Larry, Barry and Faisel.", body:"#2c1810", mane:"#0a0500" },
+  { name:"Levine, Ms Levine", bio:"Six-year-old mare with a heart the size of a bucket. Two-time winner at Cheltenham, fancied for the Gold Cup, ground specialist.", quirk:"Once went trampolining with Owen Hargreaves.", body:"#c9905a", mane:"#5a3a20" },
+  { name:"Conteh's Cooking", bio:"Eight-year-old veteran campaigner, won the Grand National in 2024 by half a length. Tough as old boots, jumps for fun, loves Aintree.", quirk:"Once took cocaine off Ali and Ozan's bald heads.", body:"#6b3410", mane:"#2a1505" },
+  { name:"The Sweaty Historian", bio:"Three-year-old colt, lightly raced but unbeaten in two starts. Won the Dewhurst in style, all the right people are talking, expected to develop into a Group 1 horse.", quirk:"Is a trained orthodontist.", body:"#9c6b3a", mane:"#3a230a" },
+  { name:"Ryan Gale's Bus", bio:"Four-year-old chestnut filly, dropped in trip and looks transformed. Won her last three starts by an aggregate of nine lengths, ground no issue.", quirk:"Once a participant on Ant and Dec's Saturnday Night Takeaway.", body:"#c47a3a", mane:"#5a2810" },
+  { name:"Jenny Loves a Tab", bio:"Five-year-old mare, course and distance winner, knows her job. Always finishes her race, never out of the first four in twelve career starts.", quirk:"Listens to Talksport and calls in regularly to abuse Jim White.", body:"#7a5230", mane:"#2a1505" },
+  { name:"Garn & Perks", bio:"Six-year-old gelding, late-developing stayer with stamina for days. Won the Ebor consolation in fine style, primed for a tilt at the Cesarewitch.", quirk:"We are closer to Mr Colvin's age when he was a teacher than we are to when we were at School. Probably.", body:"#8a5a3a", mane:"#3a200a" }
+];
+
+const PLAYER_COLOURS = [
+  { name:"Red",    silks:"#e23636", cap:"#fff", chip:"#ff4d4d" },
+  { name:"Blue",   silks:"#3286f0", cap:"#fff", chip:"#5da3ff" },
+  { name:"Gold",   silks:"#f5c518", cap:"#000", chip:"#ffd633" },
+  { name:"Green",  silks:"#36c46a", cap:"#fff", chip:"#5edb88" },
+  { name:"Purple", silks:"#a855f7", cap:"#fff", chip:"#c47fff" },
+  { name:"Orange", silks:"#fb923c", cap:"#000", chip:"#fcb168" }
+];
+
+/* =================================================================
+   DB ABSTRACTION
+   ================================================================= */
+let _db = { rooms: {} };
+const _listeners = [];
+
+function _getAt(path){
+  const parts = path.split("/").filter(Boolean);
+  let cur = _db;
+  for(const p of parts){ if(cur==null) return null; cur = cur[p]; }
+  return cur===undefined ? null : cur;
+}
+function _setAt(path, val){
+  const parts = path.split("/").filter(Boolean);
+  if(!parts.length){ _db = val; return; }
+  let cur = _db;
+  for(let i=0;i<parts.length-1;i++){
+    const p = parts[i];
+    if(cur[p]==null || typeof cur[p]!=="object") cur[p] = {};
+    cur = cur[p];
+  }
+  if(val===null) delete cur[parts[parts.length-1]];
+  else cur[parts[parts.length-1]] = val;
+}
+function _fire(){ for(const l of _listeners) l.cb(_getAt(l.path)); }
+async function dbSet(path, value){
+  if(LOCAL_MODE){ _setAt(path, value); _fire(); return; }
+  await _authReady;
+  return set(ref(_firebaseDb, path), value);
+}
+async function dbUpdate(path, updates){
+  if(LOCAL_MODE){
+    for(const k of Object.keys(updates)) _setAt(path + "/" + k, updates[k]);
+    _fire(); return;
+  }
+  await _authReady;
+  return update(ref(_firebaseDb, path), updates);
+}
+async function dbGet(path){
+  if(LOCAL_MODE) return _getAt(path);
+  await _authReady;
+  const snap = await get(ref(_firebaseDb, path));
+  return snap.val();
+}
+async function dbOnValue(path, cb){
+  if(LOCAL_MODE){
+    const entry = { path, cb };
+    _listeners.push(entry);
+    cb(_getAt(path));
+    return () => { const i=_listeners.indexOf(entry); if(i>=0) _listeners.splice(i,1); };
+  }
+  await _authReady;
+  return onValue(ref(_firebaseDb, path), snap => cb(snap.val()));
+}
+async function dbTransaction(path, updater){
+  if(LOCAL_MODE){
+    const cur = _getAt(path);
+    const next = updater(cur);
+    if(next !== undefined){ _setAt(path, next); _fire(); }
+    return next;
+  }
+  await _authReady;
+  let result;
+  await runTransaction(ref(_firebaseDb, path), current => {
+    result = updater(current);
+    return result;
+  });
+  return result;
+}
+
+/* =================================================================
+   IDENTITY
+   ================================================================= */
+function realUid(){
+  try{
+    let id = sessionStorage.getItem("hr_pid");
+    if(!id){ id = "p_" + Math.random().toString(36).slice(2,8); sessionStorage.setItem("hr_pid", id); }
+    return id;
+  }catch(e){
+    if(!window.__hr_pid) window.__hr_pid = "p_" + Math.random().toString(36).slice(2,8);
+    return window.__hr_pid;
+  }
+}
+let CURRENT_PLAYER_ID = realUid();
+function ME(){ return CURRENT_PLAYER_ID; }
+function setMe(id){ CURRENT_PLAYER_ID = id; fullRender(); }
+
+/* =================================================================
+   STATE
+   ================================================================= */
+let ROOM = null;
+let STATE = null;
+let lastAuctionSubPhase = null;
+let lastSoldHorse = null;
+let raceProfiles = null;
+let raceCommentaryLines = null;
+let raceCommentaryShown = new Set();
+let lastRaceKey = null;
+let revealTickHandle = null;
+
+const $app = document.getElementById("app");
+const rand = n => Math.floor(Math.random()*n);
+const shuffle = a => { a=[...a]; for(let i=a.length-1;i>0;i--){const j=rand(i+1);[a[i],a[j]]=[a[j],a[i]];} return a; };
+const esc = s => (s==null) ? "" : String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const genCode = () => Array.from({length:4},()=>"ABCDEFGHJKMNPQRSTUVWXYZ23456789"[rand(31)]).join("");
+
+/* =================================================================
+   AUDIO
+   ================================================================= */
+let audioCtx = null;
+let audioEnabled = false;
+let speechReady = false;
+let voices = [];
+
+function refreshVoices(){
+  if(window.speechSynthesis) voices = window.speechSynthesis.getVoices();
+}
+if(window.speechSynthesis){
+  refreshVoices();
+  window.speechSynthesis.onvoiceschanged = refreshVoices;
+}
+
+window.__enableAudio = () => {
+  try{
+    audioCtx = new (window.AudioContext||window.webkitAudioContext)();
+    if(audioCtx.state === "suspended") audioCtx.resume();
+  }catch(e){}
+  if(window.speechSynthesis){
+    const u = new SpeechSynthesisUtterance("");
+    u.volume = 0;
+    window.speechSynthesis.speak(u);
+    speechReady = true;
+  }
+  audioEnabled = true;
+  document.getElementById("audio-gate").style.display = "none";
+  fullRender();
+};
+
+function speak(text, opts={}){
+  if(!speechReady || !window.speechSynthesis) return;
+  if(opts.urgent) window.speechSynthesis.cancel();
+  const u = new SpeechSynthesisUtterance(text);
+  u.rate = opts.rate || 1.1;
+  u.pitch = opts.pitch || 1.0;
+  u.volume = opts.volume == null ? 1 : opts.volume;
+  const pref = voices.find(v => v.lang === 'en-GB' && /male|daniel|george/i.test(v.name))
+    || voices.find(v => v.lang === 'en-GB')
+    || voices.find(v => v.lang && v.lang.startsWith('en'));
+  if(pref) u.voice = pref;
+  window.speechSynthesis.speak(u);
+}
+
+function playGavel(){
+  if(!audioCtx) return;
+  const now = audioCtx.currentTime;
+  [0, 0.18].forEach((t,i) => {
+    const o = audioCtx.createOscillator();
+    const g = audioCtx.createGain();
+    o.connect(g); g.connect(audioCtx.destination);
+    o.type = "triangle";
+    o.frequency.setValueAtTime(110 - i*25, now+t);
+    g.gain.setValueAtTime(0.0001, now+t);
+    g.gain.exponentialRampToValueAtTime(0.6, now+t+0.005);
+    g.gain.exponentialRampToValueAtTime(0.0001, now+t+0.22);
+    o.start(now+t); o.stop(now+t+0.25);
+  });
+}
+
+let _crowdNodes = [];
+function stopCrowd(){
+  _crowdNodes.forEach(n => { try{ n.stop(); }catch(e){} });
+  _crowdNodes = [];
+}
+function playCrowdAndHooves(durationMs){
+  if(!audioCtx) return;
+  stopCrowd();
+  const now = audioCtx.currentTime;
+  const bufSize = Math.floor(audioCtx.sampleRate * (durationMs/1000));
+  const noiseBuf = audioCtx.createBuffer(1, bufSize, audioCtx.sampleRate);
+  const data = noiseBuf.getChannelData(0);
+  let b0=0,b1=0,b2=0;
+  for(let i=0;i<bufSize;i++){
+    const white = Math.random()*2-1;
+    b0 = 0.99*b0 + 0.0555*white;
+    b1 = 0.96*b1 + 0.2965*white;
+    b2 = 0.57*b2 + 1.0526*white;
+    data[i] = (b0+b1+b2)*0.06;
+  }
+  const noise = audioCtx.createBufferSource();
+  noise.buffer = noiseBuf;
+  const ng = audioCtx.createGain();
+  noise.connect(ng); ng.connect(audioCtx.destination);
+  ng.gain.setValueAtTime(0.12, now);
+  ng.gain.linearRampToValueAtTime(0.3, now + durationMs/1000 - 8);
+  ng.gain.linearRampToValueAtTime(0.55, now + durationMs/1000);
+  noise.start(now);
+  _crowdNodes.push(noise);
+
+  const hoofGain = audioCtx.createGain();
+  hoofGain.gain.value = 0.5;
+  hoofGain.connect(audioCtx.destination);
+  const interval = 0.13;
+  const endT = durationMs/1000;
+  for(let t=0; t<endT; t+=interval){
+    const o = audioCtx.createOscillator();
+    const g = audioCtx.createGain();
+    o.connect(g); g.connect(hoofGain);
+    o.type = "sine";
+    o.frequency.value = 85 + Math.random()*40;
+    g.gain.setValueAtTime(0.0001, now+t);
+    g.gain.exponentialRampToValueAtTime(0.5, now+t+0.005);
+    g.gain.exponentialRampToValueAtTime(0.0001, now+t+0.06);
+    o.start(now+t); o.stop(now+t+0.07);
+    _crowdNodes.push(o);
+  }
+  const bell = audioCtx.createOscillator();
+  const bg = audioCtx.createGain();
+  bell.connect(bg); bg.connect(audioCtx.destination);
+  bell.type = "triangle";
+  bell.frequency.value = 1400;
+  bg.gain.setValueAtTime(0.0001, now + endT);
+  bg.gain.exponentialRampToValueAtTime(0.8, now + endT + 0.01);
+  bg.gain.exponentialRampToValueAtTime(0.0001, now + endT + 1.5);
+  bell.start(now + endT); bell.stop(now + endT + 1.6);
+  _crowdNodes.push(bell);
+}
+
+function playStartGun(){
+  if(!audioCtx) return;
+  const now = audioCtx.currentTime;
+  const bufSize = audioCtx.sampleRate * 0.3;
+  const buf = audioCtx.createBuffer(1, bufSize, audioCtx.sampleRate);
+  const d = buf.getChannelData(0);
+  for(let i=0;i<bufSize;i++) d[i] = (Math.random()*2-1) * Math.pow(1 - i/bufSize, 3);
+  const src = audioCtx.createBufferSource();
+  src.buffer = buf;
+  const g = audioCtx.createGain();
+  g.gain.value = 0.7;
+  src.connect(g); g.connect(audioCtx.destination);
+  src.start(now);
+}
+
+function playReveal(rank, isFirst){
+  if(!audioCtx) return;
+  const now = audioCtx.currentTime;
+  if(isFirst){
+    // Fanfare
+    [523, 659, 784, 1047].forEach((freq, i) => {
+      const o = audioCtx.createOscillator();
+      const g = audioCtx.createGain();
+      o.connect(g); g.connect(audioCtx.destination);
+      o.type = "triangle";
+      o.frequency.value = freq;
+      g.gain.setValueAtTime(0.0001, now + i*0.15);
+      g.gain.exponentialRampToValueAtTime(0.4, now + i*0.15 + 0.02);
+      g.gain.exponentialRampToValueAtTime(0.0001, now + i*0.15 + 0.5);
+      o.start(now + i*0.15); o.stop(now + i*0.15 + 0.6);
+    });
+  } else {
+    // Thud
+    const o = audioCtx.createOscillator();
+    const g = audioCtx.createGain();
+    o.connect(g); g.connect(audioCtx.destination);
+    o.type = "sine";
+    o.frequency.setValueAtTime(120, now);
+    o.frequency.exponentialRampToValueAtTime(50, now + 0.3);
+    g.gain.setValueAtTime(0.0001, now);
+    g.gain.exponentialRampToValueAtTime(0.5, now + 0.01);
+    g.gain.exponentialRampToValueAtTime(0.0001, now + 0.4);
+    o.start(now); o.stop(now + 0.4);
+  }
+}
+
+/* =================================================================
+   COLOUR HELPERS
+   ================================================================= */
+function playerColour(player){
+  if(!player) return PLAYER_COLOURS[0];
+  return PLAYER_COLOURS[player.colourIdx % PLAYER_COLOURS.length];
+}
+function nextColourIdx(players){
+  const taken = new Set(Object.values(players || {}).map(p => p.colourIdx));
+  for(let i=0;i<PLAYER_COLOURS.length;i++) if(!taken.has(i)) return i;
+  return 0;
+}
+
+/* =================================================================
+   ROOM
+   ================================================================= */
+async function createRoom(name){
+  const code = genCode();
+  ROOM = code;
+  const room = {
+    code, hostId: ME(), phase: "lobby", createdAt: Date.now(),
+    players: { [ME()]: { id: ME(), name, colourIdx: 0, coins: STARTING_COINS, horseIds: [], joinedAt: Date.now() } },
+    horses: {}, auction: {}, race1: {}, race2: {}, reveal: {}, pairs: {}, teams: {}
+  };
+  await dbSet(`rooms/${code}`, room);
+  attachRoom(code);
+}
+async function joinRoom(code, name){
+  code = code.toUpperCase().trim();
+  const existing = await dbGet(`rooms/${code}`);
+  if(!existing){ alert("Room not found."); return false; }
+  if(existing.phase !== "lobby" && !(existing.players||{})[ME()]){
+    alert("Game already started, can't join."); return false;
+  }
+  ROOM = code;
+  const cIdx = nextColourIdx(existing.players || {});
+  await dbSet(`rooms/${code}/players/${ME()}`,
+    { id: ME(), name, colourIdx: cIdx, coins: STARTING_COINS, horseIds: [], joinedAt: Date.now() });
+  attachRoom(code);
+  return true;
+}
+function attachRoom(code){
+  dbOnValue(`rooms/${code}`, snap => {
+    STATE = snap;
+    if(STATE) onStateChange();
+    fullRender();
+  });
+}
+
+/* =================================================================
+   PHASE LOGIC (host-driven, also runs in LOCAL_MODE for testing)
+   ================================================================= */
+function isHost(){ return STATE && STATE.hostId === ME(); }
+function canDrive(){ return isHost() || LOCAL_MODE; }
+
+async function startGame(){
+  if(!STATE || !canDrive()) return;
+  const players = Object.values(STATE.players || {});
+  if(players.length < 3){ alert("Need at least 3 players."); return; }
+  if(players.length > 6){ alert("Max 6 players."); return; }
+
+  const N = players.length;
+  // 2 horses per player → 2N total
+  const picked = shuffle(HORSE_POOL).slice(0, N * MAX_HORSES_PER_PLAYER);
+  const horsesById = {};
+  picked.forEach((h, i) => {
+    const hid = "h" + (i+1);
+    horsesById[hid] = {
+      id: hid, ...h,
+      num: i+1,
+      ownerId: null, soldFor: 0,
+      finishPosition: null,
+      winSequence: null   // 1 = first horse owner won, 2 = second
+    };
+  });
+  const horseOrder = shuffle(Object.keys(horsesById));
+
+  await dbUpdate(`rooms/${ROOM}`, {
+    phase: "auction",
+    horses: horsesById,
+    auction: { horseOrder, currentIndex: 0, status: "starting" }
+  });
+  setTimeout(() => startNextAuction(), 500);
+}
+
+async function startNextAuction(){
+  if(!STATE || !canDrive()) return;
+  const a = STATE.auction || {};
+  const order = a.horseOrder || [];
+  let idx = a.currentIndex || 0;
+  while(idx < order.length){
+    const hid = order[idx];
+    const horse = STATE.horses[hid];
+    if(horse && !horse.ownerId) break;
+    idx++;
+  }
+  // All horses sold → race 1 intro
+  if(idx >= order.length){ return goToRace1Intro(); }
+
+  const hid = order[idx];
+
+  // Opener selection: prefer players with fewest horses, who can afford the opening bid.
+  // This ensures every player ends up with 2 horses by end of auction.
+  const eligibleAll = Object.values(STATE.players).filter(p =>
+    (p.horseIds || []).length < MAX_HORSES_PER_PLAYER &&
+    p.coins >= OPENING_BID
+  );
+  if(eligibleAll.length === 0){
+    // Should not happen with our economy, but defensively skip
+    return goToRace1Intro();
+  }
+  const minCount = Math.min(...eligibleAll.map(p => (p.horseIds || []).length));
+  const lowestPool = eligibleAll.filter(p => (p.horseIds || []).length === minCount);
+  const opener = lowestPool[rand(lowestPool.length)];
+
+  await dbUpdate(`rooms/${ROOM}/auction`, {
+    currentIndex: idx,
+    currentHorseId: hid,
+    openerId: opener.id,
+    profileEndTime: Date.now() + PROFILE_MS,
+    status: "profile",
+    sold: false
+  });
+}
+
+async function openBidding(){
+  if(!STATE || !canDrive()) return;
+  const a = STATE.auction;
+  if(!a || a.status !== "profile") return;
+  const opener = STATE.players[a.openerId];
+  if(!opener) return;
+  await dbUpdate(`rooms/${ROOM}/auction`, {
+    highBid: { playerId: opener.id, amount: OPENING_BID },
+    bids: { [opener.id]: OPENING_BID },
+    endTime: Date.now() + BID_MS,
+    status: "live"
+  });
+}
+
+async function placeBid(){
+  if(!STATE || !STATE.auction || STATE.auction.status !== "live") return;
+  const me = STATE.players[ME()];
+  if(!me) return;
+  // Already at max horses?
+  if((me.horseIds || []).length >= MAX_HORSES_PER_PLAYER) return;
+
+  const high = STATE.auction.highBid || { amount: 0 };
+  if(high.playerId === ME()) return;
+  const amount = high.amount + BID_INCREMENT;
+  if(amount > me.coins) return;   // cap is simply current balance
+
+  await dbTransaction(`rooms/${ROOM}/auction`, auction => {
+    if(!auction || auction.status !== "live") return;
+    const h = auction.highBid || { amount: 0 };
+    if(amount <= h.amount) return;
+    auction.bids = auction.bids || {};
+    auction.bids[ME()] = amount;
+    auction.highBid = { playerId: ME(), amount };
+    auction.endTime = Date.now() + BID_MS;
+    return auction;
+  });
+}
+
+async function closeAuction(){
+  if(!STATE || !STATE.auction || STATE.auction.status !== "live") return;
+  const high = STATE.auction.highBid;
+  const hid = STATE.auction.currentHorseId;
+  if(!high || !hid) return;
+
+  const player = STATE.players[high.playerId];
+  const horse = STATE.horses[hid];
+  const priorCount = (player.horseIds || []).length;
+  const newHorseIds = [...(player.horseIds || []), hid];
+  const isFirstWin = priorCount === 0;
+  const bonus = isFirstWin ? FIRST_WIN_BONUS : 0;
+  const newCoins = player.coins - high.amount + bonus;
+
+  await dbUpdate(`rooms/${ROOM}/players/${high.playerId}`, {
+    horseIds: newHorseIds, coins: newCoins
+  });
+  await dbUpdate(`rooms/${ROOM}/horses/${hid}`, {
+    ownerId: high.playerId, soldFor: high.amount,
+    winSequence: priorCount + 1   // 1 = race 1 horse, 2 = race 2 horse
+  });
+  await dbUpdate(`rooms/${ROOM}/auction`, { status: "sold" });
+
+  playGavel();
+  flashSold();
+
+  // Speak with name energy
+  const phrases = isFirstWin
+    ? [
+        `Sold to ${player.name}! That's their first horse — and 50 bonus coins!`,
+        `${player.name} gets the opening horse! Plus 50 in the kitty for the next!`,
+        `Hammered down to ${player.name} for ${high.amount}. First horse home — 50 bonus coins!`
+      ]
+    : [
+        `Sold to ${player.name} for ${high.amount}! Great buy by ${player.name}!`,
+        `${player.name} doubles up! ${horse.name} is theirs for ${high.amount}!`,
+        `${player.name} takes ${horse.name} for ${high.amount}. That's their second horse — they're set for both races!`
+      ];
+  speak(phrases[rand(phrases.length)], {urgent:true});
+
+  setTimeout(async () => {
+    await dbUpdate(`rooms/${ROOM}/auction`, { currentIndex: (STATE.auction.currentIndex||0)+1 });
+    startNextAuction();
+  }, 2400);
+}
+
+/* =================================================================
+   RACE INTROS / RACES
+   ================================================================= */
+async function goToRace1Intro(){
+  if(!STATE || !canDrive()) return;
+  await dbUpdate(`rooms/${ROOM}`, { phase: "race1-intro" });
+}
+async function startRace1(){
+  if(!STATE || !canDrive()) return;
+  await startRace(1);
+}
+async function goToRace2Intro(){
+  if(!STATE || !canDrive()) return;
+  await dbUpdate(`rooms/${ROOM}`, { phase: "race2-intro" });
+}
+async function startRace2(){
+  if(!STATE || !canDrive()) return;
+  await startRace(2);
+}
+
+async function startRace(raceNum){
+  if(!STATE || !canDrive()) return;
+  // Horses in this race: each horse whose winSequence == raceNum
+  const horses = Object.values(STATE.horses).filter(h => h.winSequence === raceNum);
+  if(horses.length === 0){
+    console.warn("No horses for race", raceNum);
+    return;
+  }
+  const order = shuffle(horses.map(h => h.id));
+  const seed = Math.floor(Math.random()*1e9);
+  const startTime = Date.now() + RACE_COUNTDOWN_MS;
+  const raceKey = "race" + raceNum;
+  await dbUpdate(`rooms/${ROOM}`, {
+    phase: raceKey,
+    [raceKey]: {
+      seed, finishingOrder: order, startTime,
+      durationMs: RACE_DURATION_MS, status: "countdown",
+      horseIds: horses.map(h => h.id)
+    }
+  });
+  setTimeout(() => { playStartGun(); speak("And they're off!", {urgent:true}); }, RACE_COUNTDOWN_MS);
+  setTimeout(async () => {
+    await dbUpdate(`rooms/${ROOM}/${raceKey}`, { status: "running" });
+    playCrowdAndHooves(RACE_DURATION_MS);
+  }, RACE_COUNTDOWN_MS);
+  setTimeout(async () => {
+    const finalOrder = (await dbGet(`rooms/${ROOM}/${raceKey}/finishingOrder`)) || order;
+    for(let i = 0; i < finalOrder.length; i++){
+      await dbUpdate(`rooms/${ROOM}/horses/${finalOrder[i]}`, { finishPosition: i + 1 });
+    }
+    await dbUpdate(`rooms/${ROOM}/${raceKey}`, { status: "finished" });
+    const winner = STATE.horses[finalOrder[0]];
+    const owner = STATE.players[winner.ownerId];
+    speak(`${winner.name} wins race ${raceNum} for ${owner.name}! Brilliant ride!`, {urgent:true});
+    setTimeout(() => {
+      if(raceNum === 1){
+        goToRace2Intro();
+      } else {
+        goToReveal();
+      }
+    }, 4500);
+  }, RACE_COUNTDOWN_MS + RACE_DURATION_MS);
+}
+
+/* =================================================================
+   REVEAL
+   ================================================================= */
+async function goToReveal(){
+  if(!STATE || !canDrive()) return;
+  // Compute each player's race1, race2 positions and average
+  const rows = [];
+  Object.values(STATE.players).forEach(p => {
+    const horses = (p.horseIds || []).map(hid => STATE.horses[hid]).filter(Boolean);
+    const r1 = horses.find(h => h.winSequence === 1);
+    const r2 = horses.find(h => h.winSequence === 2);
+    const pos1 = r1 ? r1.finishPosition : 99;
+    const pos2 = r2 ? r2.finishPosition : 99;
+    const avg = (pos1 + pos2) / 2;
+    const best = Math.min(pos1, pos2);
+    rows.push({
+      playerId: p.id, race1Pos: pos1, race2Pos: pos2,
+      race1HorseId: r1 ? r1.id : null, race2HorseId: r2 ? r2.id : null,
+      avg, best
+    });
+  });
+  // Sort worst (high avg) to best (low avg). Tiebreaker: higher best (worse single finish) sorts worse.
+  rows.sort((a, b) => {
+    if(a.avg !== b.avg) return b.avg - a.avg;
+    return b.best - a.best;
+  });
+  await dbUpdate(`rooms/${ROOM}`, {
+    phase: "reveal",
+    reveal: { sorted: rows, revealIdx: 0, lastTick: Date.now() }
+  });
+  scheduleRevealTick();
+}
+
+function scheduleRevealTick(){
+  if(revealTickHandle){ clearTimeout(revealTickHandle); }
+  revealTickHandle = setTimeout(async () => {
+    if(!STATE || STATE.phase !== "reveal") return;
+    if(!canDrive()) return;
+    const r = STATE.reveal;
+    if(!r || !r.sorted) return;
+    if(r.revealIdx >= r.sorted.length) return;
+    const next = r.revealIdx + 1;
+    await dbUpdate(`rooms/${ROOM}/reveal`, { revealIdx: next, lastTick: Date.now() });
+    // Speak the reveal
+    const row = r.sorted[r.revealIdx];
+    const player = STATE.players[row.playerId];
+    const rank = r.sorted.length - r.revealIdx;  // 6, 5, 4, ... 1
+    const rankWord = ["first","second","third","fourth","fifth","sixth","seventh","eighth"][rank-1] || (rank+"th");
+    const isFirst = rank === 1;
+    playReveal(rank, isFirst);
+    const line = `In ${rankWord}: ${player.name}. Race one: ${ordinal(row.race1Pos)}. Race two: ${ordinal(row.race2Pos)}. Average ${row.avg}.`;
+    speak(line, {urgent: isFirst, rate: isFirst ? 1.0 : 1.1});
+    if(next < r.sorted.length){
+      scheduleRevealTick();
+    }
+  }, REVEAL_INTERVAL_MS);
+}
+
+function ordinal(n){
+  if(n == null) return "—";
+  const s = ["th","st","nd","rd"], v = n%100;
+  return n + (s[(v-20)%10] || s[v] || s[0]);
+}
+
+async function startPairsPhase(){
+  if(!STATE || !canDrive()) return;
+  const r = STATE.reveal;
+  if(!r || !r.sorted) return;
+  // playerOrder: best avg first (i.e. the END of the sorted list, since sorted is worst-first)
+  const playerOrder = [...r.sorted].reverse().map(row => row.playerId);
+  const N = playerOrder.length;
+  const groups = [];
+  if(N === 6){
+    for(let i=0;i<6;i++) groups.push([i+1, 12-i]);
+  } else {
+    const picksPer = Math.floor(POT2.length / N);
+    const remainder = POT2.length % N;
+    let pos = 1;
+    for(let i=0;i<N;i++){
+      const size = picksPer + (i < remainder ? 1 : 0);
+      const g = [];
+      for(let k=0;k<size;k++) g.push(pos++);
+      groups.push(g);
+    }
+  }
+  await dbUpdate(`rooms/${ROOM}`, {
+    phase: "pairs",
+    pairs: { playerOrder, groups, currentChooser: 0, assignments: {} }
+  });
+}
+
+/* =================================================================
+   PAIRS & TEAMS
+   ================================================================= */
+async function chooseGroup(groupIndex){
+  if(!STATE || !STATE.pairs) return;
+  const pairs = STATE.pairs;
+  if(pairs.currentChooser >= pairs.playerOrder.length) return;
+  if(pairs.playerOrder[pairs.currentChooser] !== ME()) return;
+  const assignments = { ...(pairs.assignments || {}) };
+  if(Object.values(assignments).includes(groupIndex)) return;
+  assignments[ME()] = groupIndex;
+  const nextChooser = pairs.currentChooser + 1;
+  await dbUpdate(`rooms/${ROOM}/pairs`, { assignments, currentChooser: nextChooser });
+  if(nextChooser >= pairs.playerOrder.length){
+    if(canDrive()) await goToTeams();
+  }
+}
+
+async function goToTeams(){
+  if(!STATE || !canDrive()) return;
+  const pairs = STATE.pairs;
+  if(!pairs) return;
+  const pickPositions = [];
+  for(let pos=1; pos<=POT2.length; pos++){
+    let owner = null;
+    for(const [pid, gIdx] of Object.entries(pairs.assignments || {})){
+      if(pairs.groups[gIdx] && pairs.groups[gIdx].includes(pos)){ owner = pid; break; }
+    }
+    pickPositions.push({ position: pos, playerId: owner });
+  }
+  const teamOrder = shuffle(POT2);
+  await dbUpdate(`rooms/${ROOM}`, {
+    phase: "teams",
+    teams: { pickPositions, teamOrder, currentPickIdx: 0, picks: {} }
+  });
+}
+
+async function pickTeam(team){
+  if(!STATE || !STATE.teams) return;
+  const t = STATE.teams;
+  const cur = t.pickPositions[t.currentPickIdx];
+  if(!cur || cur.playerId !== ME()) return;
+  if(t.picks && t.picks[team]) return;
+  const picks = { ...(t.picks || {}) };
+  picks[team] = ME();
+  const nextIdx = t.currentPickIdx + 1;
+  await dbUpdate(`rooms/${ROOM}/teams`, { picks, currentPickIdx: nextIdx });
+  if(nextIdx >= t.pickPositions.length){
+    await dbUpdate(`rooms/${ROOM}`, { phase: "final" });
+  }
+}
+
+/* =================================================================
+   STATE CHANGE HANDLER
+   ================================================================= */
+function onStateChange(){
+  if(!STATE) return;
+  if(STATE.auction && STATE.auction.status === "sold" && STATE.auction.currentHorseId !== lastSoldHorse){
+    lastSoldHorse = STATE.auction.currentHorseId;
+  }
+  if(STATE.auction && STATE.auction.status === "profile" && lastAuctionSubPhase !== "profile"){
+    if(canDrive()){
+      const delay = (STATE.auction.profileEndTime || (Date.now()+PROFILE_MS)) - Date.now();
+      setTimeout(() => {
+        if(STATE && STATE.auction && STATE.auction.status === "profile"){ openBidding(); }
+      }, Math.max(0, delay));
+    }
+    const h = STATE.horses[STATE.auction.currentHorseId];
+    if(h) speak(`Up next, horse number ${h.num}. ${h.name}.`, {urgent:true});
+  }
+  if(STATE.auction){ lastAuctionSubPhase = STATE.auction.status; }
+
+  // Reset race caches when entering a race phase fresh
+  const currentRace = STATE.phase === "race1" ? "race1" : (STATE.phase === "race2" ? "race2" : null);
+  if(currentRace && lastRaceKey !== currentRace){
+    raceProfiles = null;
+    raceCommentaryLines = null;
+    raceCommentaryShown = new Set();
+    lastRaceKey = currentRace;
+  } else if(!currentRace){
+    lastRaceKey = null;
+  }
+}
+
+function flashSold(){
+  const b = document.getElementById("sold-banner");
+  b.classList.add("show");
+  setTimeout(() => b.classList.remove("show"), 2000);
+}
+
+/* =================================================================
+   TICK LOOP
+   ================================================================= */
+function tickAuction(){
+  if(!STATE || STATE.phase !== "auction" || !STATE.auction) return;
+  const a = STATE.auction;
+  if(a.status === "profile"){
+    const el = document.getElementById("profile-countdown");
+    if(el){
+      const ms = Math.max(0, (a.profileEndTime || 0) - Date.now());
+      el.textContent = Math.ceil(ms/1000) + "s";
+    }
+  } else if(a.status === "live"){
+    const el = document.getElementById("bid-countdown");
+    if(el){
+      const ms = Math.max(0, (a.endTime || 0) - Date.now());
+      const sec = Math.ceil(ms/1000);
+      el.textContent = sec + "s";
+      el.className = "countdown" + (sec <= 3 ? " urgent" : "");
+      if(ms <= 0 && canDrive()){ closeAuction(); }
+    }
+  }
+}
+
+function getRaceState(){
+  if(STATE.phase === "race1") return STATE.race1;
+  if(STATE.phase === "race2") return STATE.race2;
+  return null;
+}
+
+function tickRace(){
+  if(!STATE) return;
+  const r = getRaceState();
+  if(!r) return;
+  if(r.status === "countdown"){
+    const el = document.getElementById("race-countdown");
+    if(el){
+      const ms = Math.max(0, (r.startTime || 0) - Date.now());
+      el.textContent = Math.ceil(ms/1000) + "";
+    }
+    return;
+  }
+  if(r.status !== "running" && r.status !== "finished") return;
+  if(!raceProfiles) raceProfiles = buildRaceProfile(r.seed, r.finishingOrder, r.durationMs);
+  if(!raceCommentaryLines) raceCommentaryLines = buildCommentary(r.seed, r.finishingOrder, STATE.horses, r.durationMs);
+
+  const elapsed = r.status === "finished" ? r.durationMs : Math.min(r.durationMs, Date.now() - r.startTime);
+  const tk = Math.min(Math.floor(elapsed/100), Math.floor(r.durationMs/100));
+
+  r.finishingOrder.forEach(hid => {
+    const dist = raceProfiles[hid][tk];
+    const el = document.getElementById("horse-" + hid);
+    if(el){
+      const trackW = +el.dataset.trackW;
+      const startX = 40;
+      const x = startX + dist * (trackW - startX - 60);
+      el.setAttribute("transform", `translate(${x}, ${el.dataset.laneY})`);
+    }
+  });
+
+  const com = document.getElementById("commentary");
+  if(com && raceCommentaryLines){
+    raceCommentaryLines.forEach((line, i) => {
+      if(elapsed >= line.atMs && !raceCommentaryShown.has(i)){
+        raceCommentaryShown.add(i);
+        const div = document.createElement("div");
+        div.className = "line" + (line.big ? " big" : "");
+        div.textContent = line.text;
+        com.appendChild(div);
+        com.scrollTop = com.scrollHeight;
+        speak(line.text, { urgent: line.big, rate: line.big ? 1.15 : 1.05 });
+      }
+    });
+  }
+}
+
+setInterval(() => { tickAuction(); tickRace(); }, 150);
+
+/* =================================================================
+   RACE PROFILE (multiple dramatic lead changes)
+   ================================================================= */
+function mulberry32(a){
+  return function(){
+    a = a + 0x6D2B79F5 | 0;
+    let t = a;
+    t = Math.imul(t ^ t>>>15, t | 1);
+    t ^= t + Math.imul(t ^ t>>>7, t | 61);
+    return ((t ^ t>>>14) >>> 0) / 4294967296;
+  };
+}
+function buildRaceProfile(seed, finishingOrder, durationMs){
+  const rng = mulberry32(seed);
+  const N = finishingOrder.length;
+  const ticks = Math.floor(durationMs / 100);
+  const CP = 6;
+  const horsePos = {};
+  finishingOrder.forEach(hid => { horsePos[hid] = [0]; });
+
+  for(let cp = 1; cp < CP - 1; cp++){
+    const t = cp / (CP - 1);
+    const noise = finishingOrder.map((hid, i) => ({ hid, score: i + (rng() - 0.5) * (8 * (1 - t) + 1.5) }));
+    noise.sort((a,b) => a.score - b.score);
+    const order = noise.map(x => x.hid);
+    const base = t;
+    order.forEach((hid, rank) => {
+      const lead = (N - rank) * 0.012;
+      horsePos[hid].push(base + lead);
+    });
+  }
+  finishingOrder.forEach((hid, rank) => {
+    horsePos[hid].push(1.0 - rank * 0.012);
+  });
+
+  const profiles = {};
+  finishingOrder.forEach(hid => {
+    const cps = horsePos[hid];
+    const arr = new Float32Array(ticks + 1);
+    for(let tk = 0; tk <= ticks; tk++){
+      const phase = (tk / ticks) * (CP - 1);
+      const i = Math.floor(phase);
+      const f = phase - i;
+      const a = cps[Math.min(i, cps.length - 1)];
+      const b = cps[Math.min(i + 1, cps.length - 1)];
+      const eased = f * f * (3 - 2 * f);
+      arr[tk] = a + (b - a) * eased;
+    }
+    for(let tk = 1; tk <= ticks; tk++){
+      if(arr[tk] < arr[tk-1]) arr[tk] = arr[tk-1] + 0.0001;
+    }
+    profiles[hid] = arr;
+  });
+  return profiles;
+}
+
+const COMMENTARY_BANK = {
+  start: ["And they're off, settling into stride!","They break cleanly from the stalls!","Away they go, jockeys looking for their positions!"],
+  early: ["{OX} jumps out fastest of all!","{O}'s {X} takes them along, setting the early gallop.","{OX} shows the way, just ahead of the chasing pack.","It's {OX} who's seizing the initiative."],
+  mid: ["{OX} takes it up now, going easily.","{O}'s {X} is being driven along, finding more.","{OY} comes through from off the pace.","{OX} on the rails, {OY} on the outside.","{OY} is making smooth progress through the field.","And here's {OX} putting his neck in front!","Trouble for {O}'s {X}, dropping back through the pack."],
+  surge: ["AND HERE COMES {OX}! Devastating turn of foot!","{OX} is flying down the outside, eating up the ground!","What a move from {OX}, taking it up at the perfect time!","{O}'s horse unleashes a finishing burst!"],
+  late: ["Inside the final furlong now.","They're driving for the line!","Two horses to settle it!","Photo finish on the cards!","The crowd is on their feet!"],
+  finish: ["{X} TAKES IT FOR {O}!","{X} crosses the line in front — brilliant ride for {O}!","{O} has done it! {X} wins!","It's {OX}, holding on bravely!"]
+};
+function pickFrom(arr, rng){ return arr[Math.floor(rng()*arr.length)]; }
+function templateLine(text, x, y, ox, oy){
+  return text
+    .replace(/{OX}/g, ox || x)
+    .replace(/{OY}/g, oy || y || ox || x)
+    .replace(/{X}/g, x)
+    .replace(/{Y}/g, y || x)
+    .replace(/{O}/g, (ox || "").split("'s ")[0] || "the owner");
+}
+function buildCommentary(seed, finishingOrder, horsesById, durationMs){
+  const rng = mulberry32(seed + 7);
+  // Helpers: name() = "Margaret"; owned() = "Liam's Margaret" if owner known
+  const horseName = id => horsesById[id].name;
+  const ownerName = id => {
+    const h = horsesById[id];
+    if(!h || !h.ownerId) return null;
+    const owner = STATE.players[h.ownerId];
+    return owner ? owner.name : null;
+  };
+  const owned = id => {
+    const o = ownerName(id);
+    const n = horseName(id);
+    return o ? `${o}'s ${n}` : n;
+  };
+  // Pre-compute frequently-used names
+  const winnerHorse = horseName(finishingOrder[0]);
+  const winnerOwner = ownerName(finishingOrder[0]);
+  const winnerOX = owned(finishingOrder[0]);
+  const secondId = finishingOrder[1] || finishingOrder[0];
+  const secondHorse = horseName(secondId);
+  const secondOX = owned(secondId);
+  const lastId = finishingOrder[finishingOrder.length-1];
+  const lastHorse = horseName(lastId);
+  const lastOX = owned(lastId);
+  const midIds = finishingOrder.slice(1, -1);
+  const mid1OX = midIds[0] ? owned(midIds[0]) : secondOX;
+  const mid2OX = midIds[1] ? owned(midIds[1]) : lastOX;
+
+  const lines = [];
+  lines.push({ atMs: 0, text: pickFrom(COMMENTARY_BANK.start, rng), big:true });
+  lines.push({ atMs: 6000, text: templateLine(pickFrom(COMMENTARY_BANK.early, rng), lastHorse, null, lastOX, null) });
+  lines.push({ atMs: 14000, text: templateLine(pickFrom(COMMENTARY_BANK.early, rng), secondHorse, null, secondOX, null) });
+  lines.push({ atMs: 22000, text: templateLine(pickFrom(COMMENTARY_BANK.mid, rng), lastHorse, horseName(midIds[0] || secondId), lastOX, mid1OX) });
+  lines.push({ atMs: 30000, text: templateLine(pickFrom(COMMENTARY_BANK.mid, rng), horseName(midIds[0] || secondId), winnerHorse, mid1OX, winnerOX) });
+  lines.push({ atMs: 38000, text: templateLine(pickFrom(COMMENTARY_BANK.mid, rng), secondHorse, horseName(midIds[1] || lastId), secondOX, mid2OX) });
+  lines.push({ atMs: 46000, text: templateLine(pickFrom(COMMENTARY_BANK.surge, rng), winnerHorse, null, winnerOX, null), big:true });
+  lines.push({ atMs: 53000, text: pickFrom(COMMENTARY_BANK.late, rng) });
+  lines.push({ atMs: 57000, text: pickFrom(COMMENTARY_BANK.late, rng) });
+  lines.push({ atMs: 60000, text: templateLine(pickFrom(COMMENTARY_BANK.finish, rng), winnerHorse, null, winnerOX, null).replace("{O}", winnerOwner || "the winner"), big:true });
+  return lines;
+}
+
+/* =================================================================
+   SVG HORSE
+   ================================================================= */
+function horseSVG(num, body, mane, silks, cap){
+  return `
+    <g class="horse-body">
+      <path d="M -38 -4 Q -52 -8 -54 2 Q -52 6 -38 4 Z" fill="${mane}"/>
+      <ellipse cx="-5" cy="0" rx="30" ry="13" fill="${body}"/>
+      <path d="M -14 -10 Q -10 -16 -2 -16 Q 6 -16 8 -10 L 8 -8 L -14 -8 Z" fill="${silks}"/>
+      <circle cx="-3" cy="-12" r="5" fill="${cap}"/>
+      <text x="-3" y="-9" text-anchor="middle" font-family="Anton" font-size="9" fill="#000" font-weight="bold">${num}</text>
+      <path d="M 22 -3 L 36 -18 L 32 -8 L 24 -2 Z" fill="${body}"/>
+      <path d="M 26 -10 L 36 -18 L 34 -12 L 28 -8 Z" fill="${mane}"/>
+      <ellipse cx="40" cy="-20" rx="10" ry="6" fill="${body}" transform="rotate(-12 40 -20)"/>
+      <path d="M 37 -26 L 35 -29 L 40 -27 Z" fill="${body}"/>
+      <circle cx="42" cy="-21" r="1.3" fill="#000"/>
+      <circle cx="48" cy="-19" r="1" fill="#000"/>
+      <rect class="leg-back-a" x="-22" y="8" width="3.5" height="18" fill="${body}"/>
+      <rect class="leg-back-b" x="-17" y="8" width="3.5" height="18" fill="${body}"/>
+      <rect class="leg-front-a" x="12" y="8" width="3.5" height="18" fill="${body}"/>
+      <rect class="leg-front-b" x="17" y="8" width="3.5" height="18" fill="${body}"/>
+      <g transform="translate(-3,-20)">
+        <ellipse cx="0" cy="0" rx="7" ry="9" fill="${silks}"/>
+        <rect x="-7" y="-2" width="14" height="2.5" fill="${cap}"/>
+        <rect x="3" y="-2" width="10" height="3" fill="${silks}" transform="rotate(-15 3 -1)"/>
+        <circle cx="-1" cy="-11" r="4.5" fill="#f1c27d"/>
+        <path d="M -5 -13 Q -1 -17 4 -13 L 4 -10 L -5 -10 Z" fill="${cap}"/>
+        <rect x="-5" y="-11" width="3" height="2" fill="${cap}" transform="rotate(-15 -5 -10)"/>
+      </g>
+    </g>
+  `;
+}
+
+/* =================================================================
+   RENDERERS
+   ================================================================= */
+function colourChipHTML(player){
+  const c = playerColour(player);
+  return `<span class="colour-chip" style="background:${c.chip};"></span>`;
+}
+
+function devPanel(){
+  if(!LOCAL_MODE) return "";
+  if(!STATE || !STATE.players){
+    return `<div class="dev-panel"><h4>🔧 DEV (Local Mode)</h4>
+      <div style="font-size:11px;">No room. Identity: <code style="color:var(--gold);">${ME()}</code></div>
+    </div>`;
+  }
+  const players = Object.values(STATE.players);
+  let mustBe = null;
+  let mustReason = "";
+  if(STATE.phase === "auction" && STATE.auction){
+    if(STATE.auction.status === "live"){
+      const high = STATE.auction.highBid;
+      const candidates = players.filter(p =>
+        (p.horseIds||[]).length < MAX_HORSES_PER_PLAYER &&
+        (!high || p.id !== high.playerId) &&
+        p.coins >= (high ? high.amount + BID_INCREMENT : OPENING_BID)
+      );
+      if(candidates.length){ mustBe = candidates[0].id; mustReason = "(can bid)"; }
+    }
+  } else if(STATE.phase === "pairs" && STATE.pairs && STATE.pairs.currentChooser < STATE.pairs.playerOrder.length){
+    mustBe = STATE.pairs.playerOrder[STATE.pairs.currentChooser];
+    mustReason = "(needs to pick pair)";
+  } else if(STATE.phase === "teams" && STATE.teams){
+    const cur = STATE.teams.pickPositions[STATE.teams.currentPickIdx];
+    if(cur){ mustBe = cur.playerId; mustReason = "(needs to pick team)"; }
+  }
+  return `<div class="dev-panel">
+    <h4>🔧 DEV — Acting as</h4>
+    <select onchange="window.__setMe(this.value)">
+      ${players.map(p => `<option value="${p.id}" ${p.id===ME()?'selected':''}>${esc(p.name)}${p.id===STATE.hostId?' ⭐':''}${p.id===mustBe?' 👈 TURN':''}</option>`).join("")}
+    </select>
+    ${mustBe && mustBe !== ME() ? `<button class="quick" onclick="window.__setMe('${mustBe}')">→ ${esc(STATE.players[mustBe].name)} ${esc(mustReason)}</button>` : ""}
+    ${STATE.phase === "lobby" ? `
+      <div style="margin-top:8px;border-top:1px solid #553;padding-top:8px;">
+        <div style="font-size:11px;margin-bottom:4px;">Add a player:</div>
+        <input id="devNewName" type="text" placeholder="Player name" />
+        <button class="quick" onclick="window.__addPlayer()">+ Add Player</button>
+      </div>
+    ` : ""}
+  </div>`;
+}
+window.__setMe = (id) => setMe(id);
+window.__addPlayer = () => {
+  const inp = document.getElementById("devNewName");
+  const name = (inp?.value || "").trim();
+  if(!name){ alert("Enter a name"); return; }
+  const newId = "p_" + Math.random().toString(36).slice(2,8);
+  const cIdx = nextColourIdx(STATE.players);
+  dbSet(`rooms/${ROOM}/players/${newId}`,
+    { id: newId, name, colourIdx: cIdx, coins: STARTING_COINS, horseIds: [], joinedAt: Date.now() });
+  CURRENT_PLAYER_ID = newId;
+  fullRender();
+};
+
+function renderHome(){
+  return `
+    <div class="center" style="padding-top:30px;">
+      <div class="sub">World Cup 2026 Sweepstake</div>
+      <h1 class="display gold">The Pot 2 Stakes</h1>
+      <p style="color:var(--muted);margin-top:14px;">Bid on horses. Race twice. Lowest average finish picks first.</p>
+    </div>
+    <div class="panel">
+      <h2 class="display">Create a room</h2>
+      <p class="sub">Host a new game</p>
+      <div class="col" style="margin-top:12px;">
+        <input id="hostName" type="text" placeholder="Your name" maxlength="20" />
+        <button class="btn" onclick="window.__create()">Create Room</button>
+      </div>
+    </div>
+    <div class="panel">
+      <h2 class="display">Join a room</h2>
+      <p class="sub">Enter the 4-letter code</p>
+      <div class="col" style="margin-top:12px;">
+        <input id="joinCode" type="text" placeholder="ROOM CODE" maxlength="4" style="text-transform:uppercase;letter-spacing:.2em;font-weight:700;" />
+        <input id="joinName" type="text" placeholder="Your name" maxlength="20" />
+        <button class="btn secondary" onclick="window.__join()">Join</button>
+      </div>
+    </div>
+    ${LOCAL_MODE ? `<div class="setup-banner"><b>Local Test Mode.</b> Everything works in one browser. Use the DEV panel (bottom-right) to add players. When it's not your turn, the panel offers a one-click jump to the next actor.</div>` : ""}
+  `;
+}
+window.__create = () => {
+  const name = document.getElementById("hostName").value.trim();
+  if(!name) return alert("Enter a name");
+  createRoom(name);
+};
+window.__join = () => {
+  const code = document.getElementById("joinCode").value.trim().toUpperCase();
+  const name = document.getElementById("joinName").value.trim();
+  if(!code || !name) return alert("Enter code and name");
+  joinRoom(code, name);
+};
+
+function renderLobby(){
+  const players = Object.values(STATE.players || {});
+  const host = isHost();
+  return `
+    <div class="center">
+      <div class="sub">Room Code</div>
+      <h1 class="display gold" style="letter-spacing:.2em;">${STATE.code}</h1>
+      <p style="color:var(--muted);">Share the code. ${players.length}/6 in.</p>
+    </div>
+    <div class="panel">
+      <h2 class="display">Players</h2>
+      <div class="col" style="margin-top:10px;">
+        ${players.map(p => `
+          <div class="player-tile ${p.id===ME()?'me':''}">
+            <span class="name-with-chip">${colourChipHTML(p)}<b>${esc(p.name)}</b>${p.id===STATE.hostId?' <span class="pill gold">HOST</span>':''}${p.id===ME()?' <span class="pill">YOU</span>':''}</span>
+            <span class="coin-badge">${p.coins} 🪙</span>
+          </div>`).join("")}
+      </div>
+    </div>
+    <div class="setup-banner">
+      <b>How it works:</b> 150 coins each. All 12 horses go to one auction — bid on as many as you like.<br>
+      You can win at most <b>2 horses</b>. The first you win goes to <b>Race 1</b>, the second to <b>Race 2</b>.<br>
+      When you win your first horse, you get a <b>+50 🪙 bonus</b> for the rest of the auction.<br>
+      After both races, your average finish sets the Pot 2 draft order. Lowest average picks first.
+    </div>
+    ${host ? `
+      <button class="btn huge" ${players.length<3?'disabled':''} onclick="window.__start()">
+        ${players.length<3?`Need ${3-players.length} more`:`Start the Stakes`}
+      </button>
+    ` : `<p class="center sub">Waiting for host to start...</p>`}
+  `;
+}
+window.__start = () => startGame();
+
+function renderAuction(){
+  const a = STATE.auction || {};
+  const hid = a.currentHorseId;
+  const horse = hid ? STATE.horses[hid] : null;
+  const players = Object.values(STATE.players);
+  const me = STATE.players[ME()];
+  const myCount = (me.horseIds || []).length;
+  const isLockedOut = myCount >= MAX_HORSES_PER_PLAYER;
+  const totalHorses = Object.keys(STATE.horses).length;
+  const soldCount = Object.values(STATE.horses).filter(h => h.ownerId).length;
+  const horseNum = soldCount + (a.status === "sold" ? 0 : 1);
+
+  if(!horse){ return `<div class="panel center">Loading next horse...</div>`; }
+
+  let stageHtml = "";
+  if(a.status === "profile"){
+    stageHtml = `<div class="stage-banner reading">📖 Read the horse · Bidding opens in <span id="profile-countdown">${Math.ceil(((a.profileEndTime||0)-Date.now())/1000)}s</span></div>`;
+  } else if(a.status === "live"){
+    const high = a.highBid || { amount: OPENING_BID, playerId: null };
+    const highBidder = high.playerId ? STATE.players[high.playerId] : null;
+    const nextBid = high.amount + BID_INCREMENT;
+    const canBid = !isLockedOut && nextBid <= me.coins && high.playerId !== ME();
+    const willGoTo = myCount === 0 ? "Race 1" : "Race 2";
+    const balanceNote = myCount === 0
+      ? `You have ${me.coins} 🪙. Win this and your next horse runs in Race 2 — you'll get +${FIRST_WIN_BONUS} 🪙 bonus.`
+      : `You have ${me.coins} 🪙 for your Race 2 horse.`;
+    stageHtml = `
+      <div class="stage-banner bidding">🔨 Bidding open${!isLockedOut ? ` · Win and this is your ${willGoTo} horse` : ""}</div>
+      <div class="auction-status">
+        <div>
+          <div class="sub">Top bid</div>
+          <div class="price">${high.amount} 🪙</div>
+          <div class="high-bidder">Bidder: <b>${highBidder ? esc(highBidder.name) : "—"}</b></div>
+        </div>
+        <div class="center">
+          <div class="sub">Time</div>
+          <div class="countdown" id="bid-countdown">${Math.ceil(((a.endTime||0)-Date.now())/1000)}s</div>
+        </div>
+      </div>
+      <hr class="div"/>
+      ${isLockedOut
+        ? `<div class="center sub">You already have both horses — watching only.</div>`
+        : (high.playerId === ME()
+            ? `<div class="center sub" style="color:var(--green);">✓ You're the top bidder. Wait for the hammer.</div>`
+            : `<div class="center">
+                <button class="btn green big" onclick="window.__bid()" ${canBid?'':'disabled'}>
+                  Bid ${nextBid} 🪙
+                </button>
+                <div class="sub" style="margin-top:8px;">${balanceNote}</div>
+              </div>`)
+      }
+    `;
+  } else if(a.status === "sold"){
+    const high = a.highBid;
+    const winner = high ? STATE.players[high.playerId] : null;
+    stageHtml = `<div class="stage-banner bidding">SOLD to ${winner ? esc(winner.name) : "—"} for ${high?high.amount:0} 🪙</div>`;
+  } else {
+    stageHtml = `<div class="stage-banner reading">Loading...</div>`;
+  }
+
+  const horseColourIdx = (horse.num - 1) % PLAYER_COLOURS.length;
+  return `
+    <div class="center">
+      <div class="sub">Horse ${horseNum} of ${totalHorses}</div>
+    </div>
+    <div class="horse-card">
+      <div class="row" style="align-items:flex-start;">
+        <div class="horse-num" style="background:${PLAYER_COLOURS[horseColourIdx].silks};color:${PLAYER_COLOURS[horseColourIdx].cap};">${horse.num}</div>
+        <div style="flex:1;min-width:0;">
+          <div class="horse-name">${esc(horse.name)}</div>
+        </div>
+      </div>
+      <div class="horse-bio">${esc(horse.bio)}</div>
+      <div class="horse-quirk">${esc(horse.quirk)}</div>
+      ${stageHtml}
+    </div>
+    <div class="panel">
+      <h3 class="display">Field</h3>
+      <div class="col" style="margin-top:10px;">
+        ${Object.values(STATE.horses).map(h => {
+          const owner = h.ownerId ? STATE.players[h.ownerId] : null;
+          const raceLabel = h.winSequence === 1 ? '<span class="pill gold">R1</span>' : (h.winSequence === 2 ? '<span class="pill gold">R2</span>' : '');
+          return `<div class="player-tile ${owner?'locked':''} ${h.id===hid && a.status!=='sold' ?'active':''}">
+            <span><b>#${h.num} ${esc(h.name)}</b></span>
+            <span>${owner ? `${colourChipHTML(owner)} ${esc(owner.name)} ${raceLabel} <span class="pill green">${h.soldFor}🪙</span>` : '<span class="pill">Available</span>'}</span>
+          </div>`;
+        }).join("")}
+      </div>
+    </div>
+    <div class="panel">
+      <h3 class="display">Players</h3>
+      <div class="col" style="margin-top:10px;">
+        ${players.map(p => {
+          const owned = (p.horseIds || []).map(hid => STATE.horses[hid]).filter(Boolean);
+          const ownedText = owned.length
+            ? owned.map((h, i) => `<span class="pill">${esc(h.name)} · R${i+1}</span>`).join(" ")
+            : '';
+          return `<div class="player-tile ${p.id===ME()?'me':''} ${(p.horseIds||[]).length >= MAX_HORSES_PER_PLAYER ?'locked':''}">
+            <span class="name-with-chip">${colourChipHTML(p)}<b>${esc(p.name)}</b></span>
+            <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;justify-content:flex-end;">
+              ${ownedText}
+              <span class="coin-badge">${p.coins} 🪙</span>
+            </div>
+          </div>`;
+        }).join("")}
+      </div>
+    </div>
+  `;
+}
+window.__bid = () => placeBid();
+
+function renderRaceIntro(raceNum){
+  const race1HorsesShown = raceNum === 2
+    ? Object.values(STATE.horses).filter(h => h.winSequence === 1)
+    : null;
+  const horses = Object.values(STATE.horses).filter(h => h.winSequence === raceNum);
+  return `
+    <div class="intro-hero">
+      <div class="tag">The Pot 2 Stakes</div>
+      <h1>Race ${raceNum} of 2</h1>
+      <div class="intro-rules">
+        ${raceNum === 1
+          ? `<b>Race 1.</b> Your first-bought horse runs here.<br><br>
+             After both races, your <b>average finish</b> across both horses sets the draft order. Lowest average picks first. Tiebreaker: best single finish.`
+          : `<b>Race 2.</b> Your second-bought horse runs here. Same rules.<br><br>
+             Average finishes from both races sets the draft order. Stay alert.`
+        }
+      </div>
+    </div>
+
+    ${raceNum === 2 && race1HorsesShown ? `
+      <div class="panel">
+        <h3 class="display">Race 1 result</h3>
+        <div class="col" style="margin-top:10px;">
+          ${[...race1HorsesShown].sort((a,b) => (a.finishPosition||99)-(b.finishPosition||99)).map(h => {
+            const owner = STATE.players[h.ownerId];
+            const medal = ["🥇","🥈","🥉","4️⃣","5️⃣","6️⃣"][h.finishPosition-1] || h.finishPosition+".";
+            return `<div class="player-tile">
+              <span>${medal} <b>#${h.num} ${esc(h.name)}</b></span>
+              <span>${colourChipHTML(owner)} ${esc(owner.name)}</span>
+            </div>`;
+          }).join("")}
+        </div>
+      </div>
+    ` : ""}
+
+    <div class="panel">
+      <h3 class="display">Race ${raceNum} runners</h3>
+      <div class="col" style="margin-top:10px;">
+        ${horses.map(h => {
+          const owner = STATE.players[h.ownerId];
+          return `<div class="player-tile">
+            <span><b>#${h.num} ${esc(h.name)}</b></span>
+            <span>${owner ? `${colourChipHTML(owner)} ${esc(owner.name)} <span class="pill green">${h.soldFor}🪙</span>` : '<span class="pill">—</span>'}</span>
+          </div>`;
+        }).join("")}
+      </div>
+    </div>
+
+    ${canDrive() ? `
+      <button class="btn huge" onclick="window.__startRace(${raceNum})">Start Race ${raceNum}</button>
+    ` : `<p class="center sub">Waiting for host to start the race...</p>`}
+  `;
+}
+window.__startRace = (n) => { if(n === 1) startRace1(); else startRace2(); };
+
+function renderRace(){
+  const r = getRaceState();
+  if(!r) return `<div class="panel center">Loading race...</div>`;
+  const raceNum = STATE.phase === "race1" ? 1 : 2;
+  const horses = (r.horseIds || []).map(hid => STATE.horses[hid]).filter(Boolean);
+  const N = horses.length;
+
+  if(r.status === "countdown"){
+    const sec = Math.max(0, Math.ceil((r.startTime - Date.now())/1000));
+    return `
+      <div class="center">
+        <div class="sub">Race ${raceNum} of 2</div>
+        <h2 class="display gold">Get to the rails</h2>
+        <div class="countdown" id="race-countdown" style="font-size:96px;margin:24px 0;">${sec}</div>
+      </div>
+      <div class="panel">
+        ${horses.map(h => {
+          const owner = STATE.players[h.ownerId];
+          return `<div class="player-tile">
+            <span><b>#${h.num} ${esc(h.name)}</b></span>
+            <span>${colourChipHTML(owner)} ${esc(owner.name)}</span>
+          </div>`;
+        }).join("")}
+      </div>
+    `;
+  }
+
+  const W = 700;
+  const trackTop = 40;
+  const laneHeight = 56;
+  const H = trackTop + N * laneHeight + 30;
+  const startX = 40;
+  const finishX = W - 60;
+
+  const lanes = horses.map((h, i) => {
+    const y = trackTop + i * laneHeight + laneHeight/2;
+    const owner = STATE.players[h.ownerId];
+    const ownerCol = playerColour(owner);
+    return `
+      <line x1="${startX}" y1="${y+22}" x2="${finishX}" y2="${y+22}" stroke="rgba(255,255,255,.15)" stroke-dasharray="6 4" stroke-width="1"/>
+      <g id="horse-${h.id}" class="horse-group" data-lane-y="${y}" data-track-w="${W}"
+         transform="translate(${startX}, ${y})">
+        ${horseSVG(h.num, h.body, h.mane, ownerCol.silks, ownerCol.cap)}
+      </g>
+    `;
+  }).join("");
+
+  const labels = horses.map((h, i) => {
+    const y = trackTop + i * laneHeight + laneHeight/2;
+    return `<text x="${finishX + 8}" y="${y+4}" font-family="DM Sans" font-size="11" fill="#fff" font-weight="600">#${h.num}</text>`;
+  }).join("");
+
+  let resultPanel = "";
+  if(r.status === "finished"){
+    resultPanel = `
+      <div class="panel">
+        <h2 class="display gold">Race ${raceNum} result</h2>
+        <div class="col" style="margin-top:10px;">
+          ${r.finishingOrder.map((hid, rank) => {
+            const h = STATE.horses[hid];
+            const owner = STATE.players[h.ownerId];
+            const medal = ["🥇","🥈","🥉","4️⃣","5️⃣","6️⃣"][rank] || (rank+1)+".";
+            return `<div class="player-tile ${rank===0?'me':''}">
+              <span>${medal} <b>#${h.num} ${esc(h.name)}</b></span>
+              <span>${colourChipHTML(owner)} ${esc(owner.name)}</span>
+            </div>`;
+          }).join("")}
+        </div>
+      </div>
+    `;
+  }
+
+  return `
+    <div class="center">
+      <div class="sub">Race ${raceNum} of 2</div>
+      <h2 class="display gold">${r.status === "finished" ? "🏁 Finished" : "🐎 Racing"}</h2>
+    </div>
+    <div class="race-wrap">
+      <svg class="race-svg" viewBox="0 0 ${W+50} ${H}" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="${W*0.85}" cy="20" r="14" fill="#ffd966" opacity=".8"/>
+        <path d="M0 ${trackTop} Q ${W*0.3} ${trackTop-25} ${W*0.55} ${trackTop} T ${W} ${trackTop} L ${W} ${trackTop+10} L 0 ${trackTop+10} Z" fill="#3a5a8a" opacity=".6"/>
+        <line x1="${startX}" y1="${trackTop+10}" x2="${startX}" y2="${H-15}" stroke="#fff" stroke-width="2"/>
+        <text x="${startX}" y="${trackTop+4}" text-anchor="middle" font-family="Anton" font-size="11" fill="#fff">START</text>
+        <g>
+          ${Array.from({length:Math.ceil((H-trackTop-15)/8)},(_,i)=>
+            `<rect x="${finishX-4}" y="${trackTop+10+i*8}" width="4" height="8" fill="${i%2?'#fff':'#000'}"/>
+             <rect x="${finishX}" y="${trackTop+10+i*8}" width="4" height="8" fill="${i%2?'#000':'#fff'}"/>`
+          ).join("")}
+        </g>
+        <text x="${finishX}" y="${trackTop+4}" text-anchor="middle" font-family="Anton" font-size="11" fill="#fff">FINISH</text>
+        ${lanes}
+        ${labels}
+      </svg>
+    </div>
+    <div class="commentary" id="commentary"></div>
+    ${resultPanel}
+  `;
+}
+
+function renderReveal(){
+  const r = STATE.reveal || {};
+  const sorted = r.sorted || [];
+  const N = sorted.length;
+  const revealedCount = r.revealIdx || 0;
+  const allRevealed = revealedCount >= N;
+
+  return `
+    <div class="intro-hero">
+      <div class="tag">Both races complete</div>
+      <h1>Draft Order</h1>
+      <div class="intro-rules">
+        Averages of each player's two finishes. <b>Lowest avg picks first.</b>
+      </div>
+    </div>
+    <div class="panel">
+      ${sorted.map((row, idx) => {
+        const rank = N - idx;
+        const isRevealed = idx < revealedCount;
+        const player = STATE.players[row.playerId];
+        const h1 = row.race1HorseId ? STATE.horses[row.race1HorseId] : null;
+        const h2 = row.race2HorseId ? STATE.horses[row.race2HorseId] : null;
+        return `
+          <div class="reveal-row ${isRevealed?'revealed':''} ${isRevealed && rank===1?'first':''}">
+            <div class="reveal-rank">${ordinal(rank)}</div>
+            <div>
+              ${isRevealed ? `
+                <div class="reveal-name"><span class="colour-chip" style="background:${playerColour(player).chip};"></span> ${esc(player.name)}</div>
+                <div class="reveal-info">
+                  ${h1 ? `R1: ${esc(h1.name)} (${ordinal(row.race1Pos)})` : ""}
+                  ${h2 ? ` · R2: ${esc(h2.name)} (${ordinal(row.race2Pos)})` : ""}
+                </div>
+              ` : `<div class="reveal-hidden">??? ??? ???</div>`}
+            </div>
+            <div class="reveal-avg">${isRevealed ? "Avg " + row.avg : "—"}</div>
+          </div>
+        `;
+      }).join("")}
+    </div>
+    ${allRevealed ? `
+      <button class="btn huge" onclick="window.__toPairs()" ${canDrive()?'':'disabled'}>${canDrive() ? "Continue to Draft" : "Waiting for host..."}</button>
+    ` : `<p class="center sub">Revealing...</p>`}
+  `;
+}
+window.__toPairs = () => startPairsPhase();
+
+function renderPairs(){
+  const p = STATE.pairs;
+  if(!p || !p.playerOrder){ return `<div class="panel center">Loading...</div>`; }
+  const order = p.playerOrder;
+  const groups = p.groups;
+  const assignments = p.assignments || {};
+  // GUARD: if everyone has picked, show transition (prevents crash)
+  if(p.currentChooser >= order.length){
+    return `<div class="panel center"><h2 class="display gold">All slots picked!</h2><p style="color:var(--muted);margin-top:10px;">Moving to team draft...</p></div>`;
+  }
+  const currentChooserId = order[p.currentChooser];
+  const currentChooser = STATE.players[currentChooserId];
+  const isMyTurn = currentChooserId === ME();
+  const usedGroups = new Set(Object.values(assignments));
+
+  return `
+    <div class="center">
+      <div class="sub">The Pot 2 Stakes</div>
+      <h2 class="display gold">Draft slots</h2>
+    </div>
+    <div class="turn-banner ${isMyTurn ? 'mine' : ''}">
+      <div class="who">${isMyTurn ? "Your turn!" : (currentChooser ? esc(currentChooser.name) + " is choosing" : "—")}</div>
+      <div class="desc">Pick a pair. Lower numbers = higher-ranked Pot 2 teams. Choosing 1+12 means the best team AND the worst.</div>
+    </div>
+    <div class="panel">
+      <p class="sub" style="margin-bottom:8px;">Draft order (best average first)</p>
+      ${order.map((pid, rank) => {
+        const pl = STATE.players[pid];
+        if(!pl) return "";
+        const assigned = assignments[pid];
+        const medal = ["🥇","🥈","🥉","4️⃣","5️⃣","6️⃣"][rank] || (rank+1)+".";
+        return `<div class="player-tile ${pid===ME()?'me':''} ${pid===currentChooserId?'active':(assigned!=null?'locked':'')}">
+          <span class="name-with-chip">${medal} ${colourChipHTML(pl)}<b>${esc(pl.name)}</b></span>
+          <span>${assigned != null ? `Picks: ${groups[assigned].join(", ")}` : (pid===currentChooserId?'<span class="pill gold">Choosing…</span>':'<span class="pill">Waiting</span>')}</span>
+        </div>`;
+      }).join("")}
+    </div>
+    <div class="pair-grid">
+      ${groups.map((g, i) => `
+        <div class="pair-tile ${usedGroups.has(i)?'taken':''} ${isMyTurn && !usedGroups.has(i) ? '' : 'locked'}" ${isMyTurn && !usedGroups.has(i)?`onclick="window.__pickGroup(${i})"`:''}>
+          ${g.join(" + ")}
+          <small>Picks ${g.length === 2 ? `${g[0]} and ${g[1]}` : g.join(", ")}</small>
+        </div>
+      `).join("")}
+    </div>
+  `;
+}
+window.__pickGroup = (i) => chooseGroup(i);
+
+function renderTeams(){
+  const t = STATE.teams;
+  if(!t || !t.pickPositions){ return `<div class="panel center">Loading...</div>`; }
+  if(t.currentPickIdx >= t.pickPositions.length){
+    return `<div class="panel center"><h2 class="display gold">All picks made!</h2><p style="color:var(--muted);margin-top:10px;">Showing final result...</p></div>`;
+  }
+  const cur = t.pickPositions[t.currentPickIdx];
+  const isMyTurn = cur && cur.playerId === ME();
+  const currentPicker = cur ? STATE.players[cur.playerId] : null;
+  const picksByPlayer = {};
+  Object.entries(t.picks || {}).forEach(([team, pid]) => {
+    if(!picksByPlayer[pid]) picksByPlayer[pid] = [];
+    picksByPlayer[pid].push(team);
+  });
+
+  return `
+    <div class="center">
+      <div class="sub">Pick ${t.currentPickIdx+1} of ${t.pickPositions.length}</div>
+      <h2 class="display gold">Team Draft</h2>
+    </div>
+    <div class="turn-banner ${isMyTurn ? 'mine' : ''}">
+      <div class="who">${isMyTurn ? "Pick a team!" : (currentPicker ? esc(currentPicker.name) + " is picking" : "—")}</div>
+      <div class="desc">${isMyTurn ? "Tap any available team below." : "Wait your turn."}</div>
+    </div>
+    <div class="team-grid">
+      ${t.teamOrder.map(team => {
+        const owner = (t.picks||{})[team];
+        const ownerPl = owner ? STATE.players[owner] : null;
+        const mine = owner === ME();
+        return `<div class="team-tile ${owner?(mine?'mine':'taken'):''} ${isMyTurn && !owner ?'':'locked'}" 
+          ${isMyTurn && !owner?`onclick="window.__pickTeam('${esc(team).replace(/'/g,'')}')"`:''}>
+          ${esc(team)}${ownerPl?`<span class="owner">${esc(ownerPl.name)}</span>`:''}
+        </div>`;
+      }).join("")}
+    </div>
+    <div class="panel">
+      <h3 class="display">Picks so far</h3>
+      <div class="col" style="margin-top:10px;">
+        ${Object.values(STATE.players).map(p => {
+          const ts = picksByPlayer[p.id] || [];
+          return `<div class="player-tile ${p.id===ME()?'me':''}">
+            <span class="name-with-chip">${colourChipHTML(p)}<b>${esc(p.name)}</b></span>
+            <span>${ts.length ? ts.map(t=>`<span class="pill green">${esc(t)}</span>`).join(" ") : '<span class="pill">No teams</span>'}</span>
+          </div>`;
+        }).join("")}
+      </div>
+    </div>
+  `;
+}
+window.__pickTeam = (team) => pickTeam(team);
+
+function renderFinal(){
+  const t = STATE.teams || {};
+  const picksByPlayer = {};
+  Object.entries(t.picks || {}).forEach(([team, pid]) => {
+    if(!picksByPlayer[pid]) picksByPlayer[pid] = [];
+    picksByPlayer[pid].push(team);
+  });
+  return `
+    <div class="center" style="padding-top:20px;">
+      <div class="sub">The Pot 2 Stakes</div>
+      <h1 class="display gold">Final draft</h1>
+    </div>
+    ${Object.values(STATE.players).map(p => {
+      const ts = picksByPlayer[p.id] || [];
+      const horses = (p.horseIds || []).map(hid => STATE.horses[hid]).filter(Boolean);
+      return `<div class="panel">
+        <div class="row" style="justify-content:space-between;align-items:center;">
+          <h2 class="display"><span class="colour-chip" style="background:${playerColour(p).chip};"></span> ${esc(p.name)}</h2>
+          <div class="row gap-sm">
+            ${horses.map(h => `<span class="pill gold">🐎 ${esc(h.name)}</span>`).join("")}
+          </div>
+        </div>
+        <div class="row gap-sm" style="margin-top:10px;">
+          ${ts.map(t => `<span class="pill green">${esc(t)}</span>`).join("")}
+        </div>
+      </div>`;
+    }).join("")}
+    <div class="center" style="margin-top:24px;">
+      <p style="color:var(--muted);">Screenshot and drop in the group chat.</p>
+    </div>
+  `;
+}
+
+/* =================================================================
+   MAIN RENDER
+   ================================================================= */
+function fullRender(){
+  let html = "";
+  try{
+    if(!STATE) html = renderHome();
+    else if(STATE.phase === "lobby") html = renderLobby();
+    else if(STATE.phase === "auction") html = renderAuction();
+    else if(STATE.phase === "race1-intro") html = renderRaceIntro(1);
+    else if(STATE.phase === "race1") html = renderRace();
+    else if(STATE.phase === "race2-intro") html = renderRaceIntro(2);
+    else if(STATE.phase === "race2") html = renderRace();
+    else if(STATE.phase === "reveal") html = renderReveal();
+    else if(STATE.phase === "pairs") html = renderPairs();
+    else if(STATE.phase === "teams") html = renderTeams();
+    else if(STATE.phase === "final") html = renderFinal();
+    else html = `<div class="panel center">Unknown phase: ${esc(STATE.phase)}</div>`;
+  } catch(e){
+    console.error("Render error:", e);
+    html = `<div class="panel center">
+      <h2 class="display">Something went wrong rendering.</h2>
+      <p style="color:var(--muted);">${esc(e.message || e)}</p>
+      <p style="color:var(--muted);font-size:11px;">Phase: ${esc(STATE && STATE.phase)}</p>
+    </div>`;
+  }
+  $app.innerHTML = html + devPanel();
+}
+
+/* =================================================================
+   BOOT
+   ================================================================= */
+if(typeof window.speechSynthesis === "undefined" || audioEnabled){
+  document.getElementById("audio-gate").style.display = "none";
+} else {
+  document.getElementById("audio-gate").style.display = "flex";
+}
+fullRender();
+</script>
+</body>
+</html>
