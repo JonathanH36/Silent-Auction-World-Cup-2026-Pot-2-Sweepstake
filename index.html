@@ -403,6 +403,8 @@ let ROOM = null;
 let STATE = null;
 let lastAuctionSubPhase = null;
 let lastSoldHorse = null;
+let _closingAuction = false;   // re-entrancy lock so a horse can only be sold once
+let _toTeamsFired = false;     // ensures the host advances draft -> teams exactly once
 let raceProfiles = null;
 let raceCommentaryLines = null;
 let raceCommentaryShown = new Set();
@@ -758,49 +760,62 @@ async function placeBid(){
 }
 
 async function closeAuction(){
+  if(_closingAuction) return;                                   // already closing this horse
   if(!STATE || !STATE.auction || STATE.auction.status !== "live") return;
-  const high = STATE.auction.highBid;
-  const hid = STATE.auction.currentHorseId;
-  if(!high || !hid) return;
+  _closingAuction = true;
+  try{
+    // Read the authoritative auction node fresh, so a late bid isn't lost to a
+    // stale local snapshot, and so currentIndex is bumped from the real value.
+    const a = await dbGet(`rooms/${ROOM}/auction`);
+    if(!a || a.status !== "live") return;                      // someone already closed it
+    const high = a.highBid;
+    const hid  = a.currentHorseId;
+    if(!high || !hid) return;
 
-  const player = STATE.players[high.playerId];
-  const horse = STATE.horses[hid];
-  const priorCount = (player.horseIds || []).length;
-  const newHorseIds = [...(player.horseIds || []), hid];
-  const isFirstWin = priorCount === 0;
-  const bonus = isFirstWin ? FIRST_WIN_BONUS : 0;
-  const newCoins = player.coins - high.amount + bonus;
+    const player = STATE.players[high.playerId];
+    const horse  = STATE.horses[hid];
+    if(!player || !horse) return;
 
-  await dbUpdate(`rooms/${ROOM}/players/${high.playerId}`, {
-    horseIds: newHorseIds, coins: newCoins
-  });
-  await dbUpdate(`rooms/${ROOM}/horses/${hid}`, {
-    ownerId: high.playerId, soldFor: high.amount,
-    winSequence: priorCount + 1   // 1 = race 1 horse, 2 = race 2 horse
-  });
-  await dbUpdate(`rooms/${ROOM}/auction`, { status: "sold" });
+    const priorCount = (player.horseIds || []).length;
+    const newHorseIds = [...(player.horseIds || []), hid];
+    const isFirstWin = priorCount === 0;
+    const bonus = isFirstWin ? FIRST_WIN_BONUS : 0;
+    const newCoins = player.coins - high.amount + bonus;
 
-  playGavel();
-  flashSold();
+    // Flip to "sold" first so the 150ms tick can't re-enter while writes settle.
+    await dbUpdate(`rooms/${ROOM}/auction`, { status: "sold" });
+    await dbUpdate(`rooms/${ROOM}/players/${high.playerId}`, {
+      horseIds: newHorseIds, coins: newCoins
+    });
+    await dbUpdate(`rooms/${ROOM}/horses/${hid}`, {
+      ownerId: high.playerId, soldFor: high.amount,
+      winSequence: priorCount + 1   // 1 = race 1 horse, 2 = race 2 horse
+    });
 
-  // Speak with name energy
-  const phrases = isFirstWin
-    ? [
-        `Sold to ${player.name}! That's their first horse — and 50 bonus coins!`,
-        `${player.name} gets the opening horse! Plus 50 in the kitty for the next!`,
-        `Hammered down to ${player.name} for ${high.amount}. First horse home — 50 bonus coins!`
-      ]
-    : [
-        `Sold to ${player.name} for ${high.amount}! Great buy by ${player.name}!`,
-        `${player.name} doubles up! ${horse.name} is theirs for ${high.amount}!`,
-        `${player.name} takes ${horse.name} for ${high.amount}. That's their second horse — they're set for both races!`
-      ];
-  speak(phrases[rand(phrases.length)], {urgent:true});
+    playGavel();
+    flashSold();
 
-  setTimeout(async () => {
-    await dbUpdate(`rooms/${ROOM}/auction`, { currentIndex: (STATE.auction.currentIndex||0)+1 });
-    startNextAuction();
-  }, 2400);
+    const phrases = isFirstWin
+      ? [
+          `Sold to ${player.name}! That's their first horse — and 50 bonus coins!`,
+          `${player.name} gets the opening horse! Plus 50 in the kitty for the next!`,
+          `Hammered down to ${player.name} for ${high.amount}. First horse home — 50 bonus coins!`
+        ]
+      : [
+          `Sold to ${player.name} for ${high.amount}! Great buy by ${player.name}!`,
+          `${player.name} doubles up! ${horse.name} is theirs for ${high.amount}!`,
+          `${player.name} takes ${horse.name} for ${high.amount}. That's their second horse — they're set for both races!`
+        ];
+    speak(phrases[rand(phrases.length)], {urgent:true});
+
+    const nextIndex = (a.currentIndex || 0) + 1;
+    setTimeout(async () => {
+      await dbUpdate(`rooms/${ROOM}/auction`, { currentIndex: nextIndex });
+      startNextAuction();
+    }, 2400);
+  } finally {
+    _closingAuction = false;
+  }
 }
 
 /* =================================================================
@@ -971,9 +986,8 @@ async function chooseGroup(groupIndex){
   assignments[ME()] = groupIndex;
   const nextChooser = pairs.currentChooser + 1;
   await dbUpdate(`rooms/${ROOM}/pairs`, { assignments, currentChooser: nextChooser });
-  if(nextChooser >= pairs.playerOrder.length){
-    if(canDrive()) await goToTeams();
-  }
+  // Advancing to the teams phase is handled centrally by the host in
+  // onStateChange, so it fires exactly once no matter who picks last.
 }
 
 async function goToTeams(){
@@ -1039,6 +1053,15 @@ function onStateChange(){
     lastRaceKey = currentRace;
   } else if(!currentRace){
     lastRaceKey = null;
+  }
+  // Draft -> teams: advance from the host once everyone has picked, regardless
+  // of who made the final selection. (Previously this only fired if the last
+  // chooser happened to be the host, which could leave the draft stuck.)
+  if(STATE.phase === "pairs" && STATE.pairs && STATE.pairs.playerOrder){
+    const done = (STATE.pairs.currentChooser || 0) >= STATE.pairs.playerOrder.length;
+    if(done && canDrive() && !_toTeamsFired){ _toTeamsFired = true; goToTeams(); }
+  } else {
+    _toTeamsFired = false;
   }
 }
 
